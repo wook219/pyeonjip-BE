@@ -2,24 +2,17 @@ package com.team5.pyeonjip.cart.repository;
 
 import com.team5.pyeonjip.cart.entity.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    Cart findByUserId(Long userId);
+    List<Cart> findAllByUserId(Long userId);
 
-    @Modifying
-    @Transactional
+    Cart findByUserIdAndOptionId(Long userId, Long optionId);
+
     void deleteByUserIdAndOptionId(Long userId, Long optionId);
 
-    @Modifying
-    @Transactional
-    void deleteByUserId(Long userId);
-
-    boolean existsByUserIdAndOptionId(Long userId, Long optionId);
+    void deleteAllByUserId(Long userId);
 }

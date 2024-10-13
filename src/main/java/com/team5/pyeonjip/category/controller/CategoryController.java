@@ -1,7 +1,5 @@
 package com.team5.pyeonjip.category.controller;
 
-
-import com.team5.pyeonjip.category.dto.CategoryRequest;
 import com.team5.pyeonjip.category.dto.CategoryResponse;
 import com.team5.pyeonjip.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +24,5 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable("categoryId") Long id,
-                                                           @RequestBody CategoryRequest request) {
 
-        CategoryResponse category = categoryService.updateCategory(id, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(category);
-    }
 }

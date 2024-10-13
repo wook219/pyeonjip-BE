@@ -1,5 +1,7 @@
 package com.team5.pyeonjip.product.service;
 
+import com.team5.pyeonjip.global.exception.ErrorCode;
+import com.team5.pyeonjip.global.exception.GlobalException;
 import com.team5.pyeonjip.global.exception.ResourceNotFoundException;
 import com.team5.pyeonjip.product.dto.ProductRequest;
 import com.team5.pyeonjip.product.dto.ProductResponse;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final ProductDetailRepository productDetailRepository;
+    private final ProductImageRepository productImageRepository;
     private final ProductDetailService productDetailService;
     private final ProductImageService productImageService;
 
@@ -42,17 +46,26 @@ public class ProductService {
         return productMapper.toDto(savedProduct, savedProduct.getProductDetails(), savedProduct.getProductImages());
     }
 
-    public ProductResponse getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 상품을 찾을 수 없습니다: " + id));
-        return productMapper.toDto(product, product.getProductDetails(), product.getProductImages());
+    // ProductId로 단일 상품 조회
+    @Transactional(readOnly = true)
+    public ProductResponse getProductById(Long productId) {
+        // Product 조회
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 연관된 ProductDetail 및 ProductImage 조회
+        List<ProductDetail> productDetails = productDetailRepository.findByProductId(productId);
+        List<ProductImage> productImages = productImageRepository.findByProductId(productId);
+
+        // ProductResponse로 변환하여 반환
+        return productMapper.toDto(product, productDetails, productImages);
     }
 
     @Transactional
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
         // 1. 기존 상품 정보 조회 및 업데이트
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 상품을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setName(productRequest.getName());
         product.setDescription(productRequest.getDescription());
 
@@ -63,7 +76,23 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 상품을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
         productRepository.delete(product);
+    }
+
+    // CategoryId로 제품 리스트 조회
+    public List<ProductResponse> getProductsByCategoryId(Long categoryId) {
+        List<Product> products = productRepository.findByCategoryId(categoryId);
+
+        return products.stream()
+                .map(product -> {
+                    // ProductDetail과 ProductImage 리스트를 각각 조회
+                    List<ProductDetail> productDetails = productDetailRepository.findByProductId(product.getId());
+                    List<ProductImage> productImages = productImageRepository.findByProductId(product.getId());
+
+                    // toDto 메서드에 Product와 함께 연관 엔티티들을 전달
+                    return productMapper.toDto(product, productDetails, productImages);
+                })
+                .collect(Collectors.toList());
     }
 }

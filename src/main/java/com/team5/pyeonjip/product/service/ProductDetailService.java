@@ -1,13 +1,19 @@
 package com.team5.pyeonjip.product.service;
 
+import com.team5.pyeonjip.global.exception.ErrorCode;
+import com.team5.pyeonjip.global.exception.GlobalException;
+import com.team5.pyeonjip.global.exception.ResourceNotFoundException;
 import com.team5.pyeonjip.product.dto.ProductRequest;
 import com.team5.pyeonjip.product.entity.Product;
 import com.team5.pyeonjip.product.entity.ProductDetail;
 import com.team5.pyeonjip.product.repository.ProductDetailRepository;
+import com.team5.pyeonjip.product.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductDetailService {
     private final ProductDetailRepository productDetailRepository;
+    private final S3BucketService s3BucketService;
 
     // Create - 옵션 생성
     @Transactional
@@ -53,5 +60,54 @@ public class ProductDetailService {
     public void deleteProductDetailsByProduct(Product product) {
         List<ProductDetail> existingDetails = productDetailRepository.findByProductId(product.getId());
         productDetailRepository.deleteAll(existingDetails);
+    }
+
+    // Quantity Update - 수량 조절 메서드 추가
+    @Transactional
+    public void updateDetailQuantity(Long detailId, Long quantity) {
+        ProductDetail productDetail = productDetailRepository.findById(detailId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+        productDetail.setQuantity(productDetail.getQuantity() + quantity); // 수량 변경
+        productDetailRepository.save(productDetail);
+    }
+
+    // 대표 이미지 업로드 및 저장
+    @Transactional
+    public String uploadAndSaveMainImage(Long productDetailId, MultipartFile mainImage) throws IOException {
+        ProductDetail productDetail = productDetailRepository.findById(productDetailId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+
+        // S3에 업로드하고 대표 이미지 URL 설정
+        String mainImageUrl = s3BucketService.upload(mainImage, "main-images");
+        productDetail.setMainImage(mainImageUrl);
+        productDetailRepository.save(productDetail);
+
+        return mainImageUrl;
+    }
+
+    // 단일 ProductDetail 생성
+    @Transactional
+    public ProductDetail createProductDetail(Long productId, ProductDetail productDetail) {
+        productDetail.setProduct(new Product(productId));  // Product와 연결
+        return productDetailRepository.save(productDetail);
+    }
+
+    // 단일 ProductDetail 삭제
+    @Transactional
+    public void deleteProductDetail(Long productId, Long detailId) {
+        ProductDetail productDetail = productDetailRepository.findById(detailId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+        productDetailRepository.delete(productDetail);
+    }
+
+    // 단일 ProductDetail 수정
+    @Transactional
+    public ProductDetail updateProductDetail(Long productId, Long detailId, ProductDetail updatedDetail) {
+        ProductDetail existingDetail = productDetailRepository.findById(detailId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+        existingDetail.setName(updatedDetail.getName());
+        existingDetail.setPrice(updatedDetail.getPrice());
+        existingDetail.setQuantity(updatedDetail.getQuantity());
+        return productDetailRepository.save(existingDetail);
     }
 }
