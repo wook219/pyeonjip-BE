@@ -1,26 +1,19 @@
 package com.team5.pyeonjip.category.dto;
 
-import com.team5.pyeonjip.category.entity.Category;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CategoryRequest {
 
     private Long id;
 
     private String name;
 
-    private int sort;
+    private Integer sort;
 
     private Long parentId;
-
-//    private List<Category> child = new ArrayList<>();
 }
