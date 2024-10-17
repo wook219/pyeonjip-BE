@@ -144,6 +144,11 @@ public class ProductService {
             return productMapper.toDto(product, productDetails, productImages);
         });
     }
+    @Transactional(readOnly = true)
+    public List<ProductImage> getProductImagesByProductId(Long productId) {
+        // 상품 ID로 이미지 리스트를 조회
+        return productImageRepository.findByProductId(productId);
+    }
 
 
 }

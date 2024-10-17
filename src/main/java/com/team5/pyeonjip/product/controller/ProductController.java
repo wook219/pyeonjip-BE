@@ -131,4 +131,10 @@ public class ProductController {
         Page<ProductResponse> productResponse = productService.getAllProductspage(PageRequest.of(page, size));
         return ResponseEntity.ok(productResponse);
     }
+
+    @GetMapping("/{productId}/images")
+    public ResponseEntity<List<ProductImage>> getProductImages(@PathVariable Long productId) {
+        List<ProductImage> productImages = productService.getProductImagesByProductId(productId);
+        return ResponseEntity.ok(productImages);
+    }
 }
