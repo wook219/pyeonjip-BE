@@ -13,7 +13,7 @@ import com.team5.pyeonjip.user.entity.User;
 
 public class OrderMapper {
 
-    // entity -> dto
+    // 사용자 : entity -> dto
     public static OrderResponseDto toOrderResponseDto(Order order) {
         return OrderResponseDto.builder()
                 .id(order.getId())
@@ -22,15 +22,18 @@ public class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .orderDetails(order.getOrderDetails().stream()
                         .map(detail -> OrderDetailDto.builder()
+                                .productDetailId(detail.getProduct().getId())
                                 .productName(detail.getProductName())
                                 .productPrice(detail.getProductPrice())
+                                .subTotalPrice(detail.getSubTotalPrice())
+                                .productImage(detail.getProduct().getMainImage())
                                 .quantity(detail.getQuantity())
                                 .build())
                         .toList())
                 .build();
     }
 
-    // 관리자 - entity -> dto
+    // 관리자 : entity -> dto
     public static AdminOrderResponseDto toAdminOrderResponseDto(Order order) {
         return AdminOrderResponseDto.builder()
                 .userEmail(order.getUser().getEmail())
@@ -53,7 +56,7 @@ public class OrderMapper {
                 .build();
     }
 
-    // dto -> entity
+    // 주문 저장 : dto -> entity
     public static Order toOrderEntity(OrderRequestDto orderRequestDto, Delivery delivery, User user, Long totalPrice) {
         return Order.builder()
                 .recipient(orderRequestDto.getRecipient() != null ? orderRequestDto.getRecipient() : user.getName()) // 수령인, 유저 기본 이름 사용
@@ -66,7 +69,7 @@ public class OrderMapper {
                 .build();
     }
 
-    // dto -> entity
+    // 주문 상세 저장 : dto -> entity
     public static OrderDetail toOrderDetailEntity(Order order, ProductDetail product, OrderDetailDto orderDetailDto) {
         return OrderDetail.builder()
                 .product(product)
