@@ -1,7 +1,6 @@
 package com.team5.pyeonjip.comment.entity;
 
-
-import com.team5.pyeonjip.product.entity.Product;
+import com.team5.pyeonjip.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,13 +23,9 @@ public class Comment {
     @Column(nullable = false, length = 500)
     private String content;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "product_id", nullable = false)
     private Long productId;
 
     private String email;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
 
     private Long rating;
 }
