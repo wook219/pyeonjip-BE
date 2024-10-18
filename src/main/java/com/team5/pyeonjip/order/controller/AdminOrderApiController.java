@@ -21,14 +21,12 @@ public class AdminOrderApiController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Page<AdminOrderResponseDto>> getOrders(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField, // 기본 최신 순
             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
             @RequestParam(value = "keyword", required = false) String keyword) {
 
-        // 구매자 이메일에 따른 주문 목록 조회
         Page<AdminOrderResponseDto> orders = orderService.findAllOrders(page, size, sortField, sortDir, keyword);
-
         return ResponseEntity.ok(orders);
     }
 
@@ -39,17 +37,15 @@ public class AdminOrderApiController {
             @PathVariable("orderId") Long orderId,
             @RequestParam("deliveryStatus") DeliveryStatus deliveryStatus) {
 
-        // 배송 상태 변경 처리
-        orderService.updateDeliveryStatus(orderId, deliveryStatus);
+        orderService.updateDeliveryStatus(orderId, deliveryStatus); // 배송 상태 변경 처리
         return ResponseEntity.ok().build();
     }
 
     // 관리자 - 주문 삭제
-    // TODO : 복수 삭제, soft delete (/orders/ 지워야 할 데이터를 바디에 보내는 것)
+    // TODO : soft delete
     @DeleteMapping("orders/{orderId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteOrder(@PathVariable("orderId") Long orderId) {
-        // 주문 삭제 처리
         orderService.deleteOrderById(orderId);
         return ResponseEntity.ok().build();
     }
