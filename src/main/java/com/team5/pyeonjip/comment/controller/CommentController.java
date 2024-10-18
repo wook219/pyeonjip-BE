@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,7 +17,7 @@ public class CommentController {
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Comment>> getCommentsByProductId(@PathVariable("productId") Long productId) {
         List<Comment> comments = commentRepository.findByProductId(productId);
-        return ResponseEntity.ok(comments);
+        return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
     @PostMapping
