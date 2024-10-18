@@ -35,6 +35,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-04", "계정을 찾을 수 없습니다."),
     USER_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "USER-05", "사용자 삭제에 실패했습니다."),
     USER_SIGNUP_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "USER-06", "회원가입에 실패했습니다."),
+    USER_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "USER-07", "정보 수정에 실패했습니다."),
     // 유저 - 로그인
     INVALID_LOGIN_REQUEST(HttpStatus.BAD_REQUEST, "LOGIN-01", "잘못된 로그인 요청입니다."),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "LOGIN-02", "인증에 실패했습니다."),
@@ -47,12 +48,18 @@ public enum ErrorCode {
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT-05", "Access 토큰이 만료되었습니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "JWT-06", "유효하지 않은 Access 토큰입니다."),
     MISSING_TOKEN(HttpStatus.UNAUTHORIZED, "JWT-07", "토큰이 제공되지 않았습니다."),
-
+    // 유저 - 로그아웃
     INVALID_LOGOUT_REQUEST(HttpStatus.BAD_REQUEST, "LOGOUT-01", "잘못된 로그아웃 요청입니다."),
     LOGOUT_MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "LOGOUT-02", "Refresh 토큰이 없습니다."),
     LOGOUT_INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "LOGOUT-03", "유효하지 않은 Refresh 토큰입니다."),
     LOGOUT_REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "LOGOUT-04", "Refresh 토큰이 만료되었습니다."),
-    LOGOUT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGOUT-05", "로그아웃 처리 중 오류가 발생했습니다.");
+    LOGOUT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGOUT-05", "로그아웃 처리 중 오류가 발생했습니다."),
+    // 유저 - 비밀번호 재설정
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESET-01", "이메일 전송에 실패했습니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "RESET-02", "잘못된 이메일 주소 형식입니다."),
+    EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "RESET-03", "해당 이메일 주소를 찾을 수 없습니다."),
+    TEMP_PASSWORD_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESET-04", "임시 비밀번호 생성에 실패했습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
