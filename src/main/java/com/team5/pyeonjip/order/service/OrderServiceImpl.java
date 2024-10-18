@@ -47,9 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
-        if (user == null) {
-            throw new IllegalArgumentException("유저를 찾을 수 없습니다.");
-        }
+
         // 배송 정보 생성
         Delivery delivery = Delivery.builder()
                 .address(combinedOrderDto.getOrderRequestDto().getAddress())  // 전달된 주소 사용
@@ -83,6 +81,13 @@ public class OrderServiceImpl implements OrderService {
             // 주문 상세 저장
             orderDetailRepository.save(OrderMapper.toOrderDetailEntity(order, productDetail, orderDetailDto));
         });
+
+        // 사용자의 총 구매 금액을 주문 후 계산
+        Long totalSpent = orderRepository.getTotalPriceByUser(user.getEmail());
+
+        // 사용자의 회원 등급 업데이트
+        updateUserGrade(user, totalSpent);
+        userRepository.save(user);
     }
 
     // 회원 등급에 따른 배송비 계산
@@ -103,6 +108,17 @@ public class OrderServiceImpl implements OrderService {
             case SILVER -> 0.05; // 5% 할인
             case BRONZE -> 0.0; // 할인 없음
         };
+    }
+
+    // 사용자 등급 업데이트 로직
+    private void updateUserGrade(User user, Long totalSpent) {
+        if (totalSpent >= 2000000) {
+            user.setGrade(Grade.GOLD);
+        } else if (totalSpent >= 1000000) {
+            user.setGrade(Grade.SILVER);
+        } else {
+            user.setGrade(Grade.BRONZE);
+        }
     }
 
     // 총 금액 계산
@@ -161,13 +177,8 @@ public class OrderServiceImpl implements OrderService {
 
         String userEmail = orderCartRequestDto.getEmail();
 
-        // 이메일 로그 출력
-        System.out.println("요청된 이메일: " + userEmail);
-
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
-
-        System.out.println("요청된 findByEmail: " + userEmail);
 
         Long cartTotalPrice = orderCartRequestDto
                 .getCartTotalPrice();
