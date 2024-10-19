@@ -29,17 +29,14 @@ public class ChatMessage extends BaseTimeEntity {
     @Size(max = 200)
     private String message;
 
-    @Column(name = "chat_room_id", nullable = false)
-    private Long chatRoomId;
+//    @Column(name = "chat_room_id", nullable = false)
+//    private Long chatRoomId;
 
-
-    /* mapping
-
+//  mapping
     @ManyToOne
-    @JoinColumn(name = "chat_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "chat_room_id", referencedColumnName = "id", nullable = false)
     private ChatRoom chatRoom;
 
-     */
 
     public void updateMessage(String message){
         this.message = message;
