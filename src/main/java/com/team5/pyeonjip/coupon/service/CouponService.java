@@ -2,6 +2,8 @@ package com.team5.pyeonjip.coupon.service;
 
 import com.team5.pyeonjip.coupon.entity.Coupon;
 import com.team5.pyeonjip.coupon.repository.CouponRepository;
+import com.team5.pyeonjip.global.exception.ErrorCode;
+import com.team5.pyeonjip.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,11 @@ public class CouponService {
         coupon.setActive(true);
         coupon.setExpiryDate(LocalDateTime.now().plusDays(7)); // 7일간의 유효기간을 가짐
 
+        validateDiscount(discount);
+        validateCouponCode(coupon.getCode());
         return saveCoupon(coupon);
     }
-
+    // 사용자 지정 쿠폰 생성 WIP
     @Transactional
     public Coupon createCoupon(String Code, Long discount, LocalDateTime expiryDate){
         Coupon coupon = new Coupon();
@@ -37,16 +41,21 @@ public class CouponService {
         coupon.setActive(true);
         coupon.setExpiryDate(expiryDate);
 
+        validateDiscount(discount);
+        validateCouponCode(coupon.getCode());
         return saveCoupon(coupon);
     }
 
-    // 쿠폰 코드 자동 생성
-    public String generateCouponCode() {
-        return UUID.randomUUID().toString().substring(0, 4).toUpperCase(); // 4자리 랜덤 코드 생성
+    // 쿠폰 활성화/비활성화
+    @Transactional
+    public Coupon updateCouponStatus(Long id, boolean isActive) {
+        Coupon coupon = couponRepository.findById(id)
+                .orElseThrow(() -> new GlobalException(ErrorCode.COUPON_NOT_FOUND));
+        coupon.setActive(isActive);
+        return saveCoupon(coupon);
     }
 
     public Coupon saveCoupon(Coupon coupon) {
-        log.info("Created coupon: {}", coupon);
         return couponRepository.save(coupon);
     }
 
@@ -55,6 +64,26 @@ public class CouponService {
     }
 
     public void deleteCouponById(Long id) {
+        if(!couponRepository.existsById(id)) {
+            throw new GlobalException(ErrorCode.COUPON_NOT_FOUND);
+        }
         couponRepository.deleteById(id);
+    }
+
+    // 쿠폰 코드 자동 생성
+    public String generateCouponCode() {
+        return UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+    }
+
+    private void validateDiscount(Long discount) {
+        if(discount < 0 || discount > 100 ){
+            throw new GlobalException(ErrorCode.INVALID_COUPON_DISCOUNT);
+        }
+    }
+
+    private void validateCouponCode(String code) {
+        if(couponRepository.existsByCode(code)){
+            throw new GlobalException(ErrorCode.INVALID_COUPON_CODE);
+        }
     }
 }

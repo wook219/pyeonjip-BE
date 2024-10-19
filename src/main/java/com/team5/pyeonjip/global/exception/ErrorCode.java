@@ -34,15 +34,17 @@ public enum ErrorCode {
 
     // 장바구니
     CART_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-01", "장바구니를 찾을 수 없습니다."),
-    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-02", "해당 장바구니 아이템을 찾을 수 없습니다."),
-    CART_ITEM_ALREADY_EXISTS(HttpStatus.CONFLICT, "CART-03", "해당 아이템이 이미 장바구니에 있습니다."),
-    CART_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "CART-04", "유효하지 않은 수량입니다."),
-    CART_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CART-05", "장바구니 작업에 실패했습니다."),
+    CART_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "CART-02", "유효하지 않은 수량입니다."),
+    CART_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CART-03", "장바구니 작업에 실패했습니다."),
+
     // 쿠폰
+    INVALID_COUPON_CODE(HttpStatus.BAD_REQUEST, "COUPON-01", "유효하지 않은 쿠폰 코드입니다."),
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "COUPON-02", "해당 쿠폰을 찾을 수 없습니다."),
+    INVALID_COUPON_DISCOUNT(HttpStatus.BAD_REQUEST, "COUPON-03", "유효하지 않은 할인 금액입니다."),
 
     // 코멘트
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-01", "해당 코멘트를 찾을 수 없습니다."),
-   EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "COMMENT-02", "코멘트 내용이 비어 있습니다."),
+    EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "COMMENT-02", "코멘트 내용이 비어 있습니다."),
     EMPTY_COMMENT_TITLE(HttpStatus.BAD_REQUEST, "COMMENT-03", "코멘트 내용이 비어 있습니다."),
     EMPTY_COMMENT_RATING(HttpStatus.BAD_REQUEST, "COMMENT-04", "평점이 비어있습니다."),
 
