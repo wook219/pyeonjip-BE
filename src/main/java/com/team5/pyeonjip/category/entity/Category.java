@@ -24,6 +24,7 @@ public class Category {
     private String name;
 
     @ColumnDefault("999")
+    @Column(nullable = false)
     private Integer sort; //낮을수록 먼저 반환
 
     @Column(name = "parent_id")
@@ -43,6 +44,6 @@ public class Category {
     // toString() 무한 재귀호출 방지
     @Override
     public String toString() {
-        return String.format("Category(id=%d, name='%s')", id, name);
+        return String.format("Category(id=%d, name='%s', sort='%d')", id, name, sort);
     }
 }
