@@ -1,9 +1,12 @@
 package com.team5.pyeonjip.user.entity;
 
+import com.team5.pyeonjip.chat.entity.ChatRoom;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,8 +58,8 @@ public class User {
     /* Mapping(ERD 참고 임시 작성) */
 
 //    ChatRoom과 일대다 Optional 매핑
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<ChatRoom> chatRooms;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRooms;
 
 //    Order와 일대다 Optional 매핑
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
