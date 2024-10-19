@@ -28,7 +28,11 @@ public enum ErrorCode {
     DELIVERY_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "DELIVERY-01", "배송이 시작된 주문은 취소할 수 없습니다."),
 
     // 장바구니
-
+    CART_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-01", "장바구니를 찾을 수 없습니다."),
+    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-02", "해당 장바구니 아이템을 찾을 수 없습니다."),
+    CART_ITEM_ALREADY_EXISTS(HttpStatus.CONFLICT, "CART-03", "해당 아이템이 이미 장바구니에 있습니다."),
+    CART_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "CART-04", "유효하지 않은 수량입니다."),
+    CART_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CART-05", "장바구니 작업에 실패했습니다."),
     // 쿠폰
 
     // 코멘트

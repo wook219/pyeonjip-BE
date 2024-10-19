@@ -3,7 +3,9 @@ package com.team5.pyeonjip.cart.entity;
 import com.team5.pyeonjip.product.entity.Product;
 import com.team5.pyeonjip.product.entity.ProductDetail;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -23,4 +25,9 @@ public class Cart {
 
     private Long quantity; // 사용자가 선택한 수량 (기본값 : 1)
 
+    public Cart(String email, Long optionId, Long quantity) {
+    }
+
+    public Cart() {
+    }
 }
