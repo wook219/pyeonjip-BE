@@ -32,7 +32,7 @@ public class CouponService {
         validateCouponCode(coupon.getCode());
         return saveCoupon(coupon);
     }
-    // 사용자 지정 쿠폰 생성 WIP
+    // 사용자 지정 쿠폰 생성
     @Transactional
     public Coupon createCoupon(String Code, Long discount, LocalDateTime expiryDate){
         Coupon coupon = new Coupon();
