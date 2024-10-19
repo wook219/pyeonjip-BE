@@ -32,6 +32,21 @@ public enum ErrorCode {
     USER_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "ORDER-02", "해당 사용자의 주문을 찾을 수 없습니다."),
     DELIVERY_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "DELIVERY-01", "배송이 시작된 주문은 취소할 수 없습니다."),
 
+    // 장바구니
+    CART_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-01", "장바구니를 찾을 수 없습니다."),
+    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-02", "해당 장바구니 아이템을 찾을 수 없습니다."),
+    CART_ITEM_ALREADY_EXISTS(HttpStatus.CONFLICT, "CART-03", "해당 아이템이 이미 장바구니에 있습니다."),
+    CART_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "CART-04", "유효하지 않은 수량입니다."),
+    CART_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CART-05", "장바구니 작업에 실패했습니다."),
+    // 쿠폰
+
+    // 코멘트
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-01", "해당 코멘트를 찾을 수 없습니다."),
+   EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "COMMENT-02", "코멘트 내용이 비어 있습니다."),
+    EMPTY_COMMENT_TITLE(HttpStatus.BAD_REQUEST, "COMMENT-03", "코멘트 내용이 비어 있습니다."),
+    EMPTY_COMMENT_RATING(HttpStatus.BAD_REQUEST, "COMMENT-04", "평점이 비어있습니다."),
+
+
     // 유저
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-01", "사용자를 찾을 수 없습니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER-02", "이미 존재하는 이메일입니다."),
@@ -63,6 +78,8 @@ public enum ErrorCode {
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "RESET-02", "잘못된 이메일 주소 형식입니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "RESET-03", "해당 이메일 주소를 찾을 수 없습니다."),
     TEMP_PASSWORD_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESET-04", "임시 비밀번호 생성에 실패했습니다.");
+
+
 
 
     private final HttpStatus httpStatus;
