@@ -79,7 +79,14 @@ public class ReissueService {
         refreshRepository.deleteByRefresh(refreshToken);
         addRefresh(email, newRefreshToken, 86400000L);
 
-        response.setHeader("access", newAccessToken);
+        // 삭제 대상 토큰이 쿠키에 포함되는 문제가 있어, 명시적으로 삭제하는 코드를 추가
+        Cookie deleteOldRefreshToken = new Cookie("refresh", null);
+        deleteOldRefreshToken.setMaxAge(0);
+        deleteOldRefreshToken.setPath("/");
+        deleteOldRefreshToken.setHttpOnly(true);
+
+        response.setHeader("Authorization", "Bearer " + newAccessToken);
+        response.addCookie(deleteOldRefreshToken);
         response.addCookie(createCookie("refresh", newRefreshToken));
     }
 
