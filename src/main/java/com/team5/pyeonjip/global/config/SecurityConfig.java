@@ -102,6 +102,7 @@ public class SecurityConfig {
                         // 로그인 한 사용자만 접근 가능
 
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
 
                         // 토큰 리이슈
                         .requestMatchers("/api/user/reissue").permitAll()
