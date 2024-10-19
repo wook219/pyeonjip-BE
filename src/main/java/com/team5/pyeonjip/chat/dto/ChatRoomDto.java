@@ -1,22 +1,22 @@
 package com.team5.pyeonjip.chat.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.team5.pyeonjip.chat.entity.ChatRoomStatus;
+import lombok.*;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomDto {
     private Long id;
     private String category;
-    private boolean isClosed;
-    private Timestamp closedAt;
+    private ChatRoomStatus status;
     private Long userId;
+    private String userEmail;
     private Long adminId;
+    private String adminEmail;
     private Timestamp createdAt;
 }

@@ -9,6 +9,6 @@ import org.mapstruct.Mapping;
 public interface ChatMessageMapper {
 
     // Entity -> DTO
-    @Mapping(source = "chatRoomId", target = "chatRoomId")
+    @Mapping(source = "chatRoom.id", target = "chatRoomId")
     ChatMessageDto toDTO(ChatMessage chatMessage);
 }
