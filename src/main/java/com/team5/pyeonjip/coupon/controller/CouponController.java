@@ -19,7 +19,7 @@ public class CouponController {
     @PostMapping
     public ResponseEntity<Coupon> createCoupon(@RequestParam Long discount) {
         Coupon coupon = couponService.createRandomCoupon(discount);
-        return ResponseEntity.status(HttpStatus.OK).body(coupon);
+        return ResponseEntity.status(HttpStatus.CREATED).body(coupon);
     }
 
     @GetMapping
@@ -28,8 +28,8 @@ public class CouponController {
         return ResponseEntity.status(HttpStatus.OK).body(coupons);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Coupon> deleteCoupon(@RequestParam Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Coupon> deleteCoupon(@PathVariable Long id) {
         couponService.deleteCouponById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
