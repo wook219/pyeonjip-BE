@@ -85,7 +85,6 @@ public class CartService {
         if (dto.getQuantity() > productDetail.getQuantity()) {
             throw new GlobalException(OUT_OF_STOCK);
         }
-
         try {
             target.setQuantity(dto.getQuantity());
             cartRepository.save(target);
@@ -117,7 +116,7 @@ public class CartService {
     @Transactional
     public List<CartDto> sync(String email, List<CartDto> localCartItems) {
         Map<Long, Cart> serverItemMap = cartRepository.findAllByEmail(email)
-                .orElseThrow(() -> new GlobalException(CART_ITEM_NOT_FOUND))
+                .orElseThrow(() -> new GlobalException(CART_NOT_FOUND))
                 .stream()
                 .collect(Collectors.toMap(Cart::getOptionId, Function.identity()));
         // 로컬 카트 아이템을 순회하여 동기화
@@ -130,8 +129,7 @@ public class CartService {
                 try {
                     cartRepository.save(serverItem);
                 } catch (Exception e) {
-                    // 로깅 및 예외 처리
-                    log.error("Failed to save cart item: {}", localItem.getOptionId(), e);
+                    throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
                 }
             } else {
                 // 서버에 없는 경우 새로 추가
@@ -142,8 +140,7 @@ public class CartService {
                 try {
                     cartRepository.save(newCartItem);
                 } catch (Exception e) {
-                    // 로깅 및 예외 처리
-                    log.error("Failed to create new cart item: {}", localItem.getOptionId(), e);
+                    throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
                 }
             }
         }
