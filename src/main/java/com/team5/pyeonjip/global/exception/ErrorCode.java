@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     // 채팅
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_ROOM-01", "채팅방을 찾을 수 없습니다."),
+    WAITING_ROOM_ACTIVATE(HttpStatus.BAD_REQUEST, "CHAT-ROOM-02", "대기 중인 채팅방이 아닙니다."),
     CHAT_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_MESSAGE-01", "메시지를 불러올 수 없습니다."),
     UNAUTHORIZED_MESSAGE_MODIFICATION(HttpStatus.FORBIDDEN,"CHAT_MESSAGE-02", "권한이 없는 메시지 수정 시도"),
     UNAUTHORIZED_MESSAGE_DELETION(HttpStatus.FORBIDDEN,"CHAT_MESSAGE-03", "권한이 없는 메시지 삭제 시도"),

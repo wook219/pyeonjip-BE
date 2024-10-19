@@ -47,7 +47,8 @@ public class ChatRoomService {
     }
 
     public ChatRoomDto createWaitingRoom(String category, String userEmail) {
-        User user = userRepository.findByEmail(userEmail);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .category(category)
@@ -65,10 +66,12 @@ public class ChatRoomService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         if (chatRoom.getStatus() != ChatRoomStatus.WAITING) {
-            throw new IllegalStateException("대기 중인 채팅방만 활성화할 수 있습니다.");
+            throw new GlobalException(ErrorCode.WAITING_ROOM_ACTIVATE);
         }
 
-        User admin = userRepository.findByEmail(adminEmail);
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+
         User user = chatRoom.getUser();
 
         chatRoom.updateStatus(ChatRoomStatus.ACTIVE);
@@ -96,7 +99,7 @@ public class ChatRoomService {
 
     private void notifyUserRoomActivated(ChatRoomDto chatRoom) {
         if (chatRoom.getUserEmail() == null) {
-            throw new IllegalArgumentException("사용자 이메일이 없습니다.");
+            throw new GlobalException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         messagingTemplate.convertAndSendToUser(
                 chatRoom.getUserEmail(),
