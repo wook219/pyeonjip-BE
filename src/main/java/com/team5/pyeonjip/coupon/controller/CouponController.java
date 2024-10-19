@@ -42,7 +42,7 @@ public class CouponController {
 
     // 쿠폰 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Coupon> deleteCoupon(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCoupon(@PathVariable Long id) {
         couponService.deleteCouponById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
