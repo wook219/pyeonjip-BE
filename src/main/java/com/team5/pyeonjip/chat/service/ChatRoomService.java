@@ -2,20 +2,32 @@ package com.team5.pyeonjip.chat.service;
 
 import com.team5.pyeonjip.chat.dto.ChatRoomDto;
 import com.team5.pyeonjip.chat.entity.ChatRoom;
+import com.team5.pyeonjip.chat.entity.ChatRoomStatus;
 import com.team5.pyeonjip.chat.mapper.ChatRoomMapper;
 import com.team5.pyeonjip.chat.repository.ChatRoomRepository;
+import com.team5.pyeonjip.global.exception.ErrorCode;
+import com.team5.pyeonjip.global.exception.GlobalException;
+import com.team5.pyeonjip.user.entity.User;
+import com.team5.pyeonjip.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
     private final ChatRoomMapper chatRoomMapper;
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     public List<ChatRoomDto> getChatRooms(){
         List<ChatRoom> chatRooms = chatRoomRepository.findAll();
@@ -28,25 +40,85 @@ public class ChatRoomService {
         return chatRoomDtos;
     }
 
-    public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto){
+    public ChatRoomDto getChatRoomById(Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        return chatRoomMapper.toDTO(chatRoom);
+    }
+
+    public ChatRoomDto createWaitingRoom(String category, String userEmail) {
+        User user = userRepository.findByEmail(userEmail);
+
         ChatRoom chatRoom = ChatRoom.builder()
-                .category(chatRoomDto.getCategory())
-                .isClosed(chatRoomDto.isClosed())
-                .userId(1L)
-                .adminId(2L)
+                .category(category)
+                .status(ChatRoomStatus.WAITING)
+                .user(user)
                 .build();
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
         return chatRoomMapper.toDTO(savedChatRoom);
     }
 
-    public List<ChatRoomDto> getChatRoomsByUserId(Long userId){
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUserId(userId);
+    @Transactional
+    public ChatRoomDto activateChatRoom(Long chatRoomId, String adminEmail) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+
+        if (chatRoom.getStatus() != ChatRoomStatus.WAITING) {
+            throw new IllegalStateException("대기 중인 채팅방만 활성화할 수 있습니다.");
+        }
+
+        User admin = userRepository.findByEmail(adminEmail);
+        User user = chatRoom.getUser();
+
+        chatRoom.updateStatus(ChatRoomStatus.ACTIVE);
+        chatRoom.updateAdmin(admin);
+
+        ChatRoom updatedChatRoom = chatRoomRepository.save(chatRoom);
+        ChatRoomDto updatedRoomDto = chatRoomMapper.toDTO(updatedChatRoom);
+
+        updatedRoomDto.setUserEmail(user.getEmail());
+
+        // 사용자에게 채팅방 활성화 알림
+        messagingTemplate.convertAndSendToUser(
+                chatRoom.getUser().getEmail(),
+                "/queue/chat-room-activated",
+                updatedRoomDto
+        );
+
+        return updatedRoomDto;
+    }
+
+
+    private void notifyAdminsNewWaitingRoom(ChatRoom chatRoom) {
+        messagingTemplate.convertAndSend("/topic/admin/waiting-rooms", chatRoom);
+    }
+
+    private void notifyUserRoomActivated(ChatRoomDto chatRoom) {
+        if (chatRoom.getUserEmail() == null) {
+            throw new IllegalArgumentException("사용자 이메일이 없습니다.");
+        }
+        messagingTemplate.convertAndSendToUser(
+                chatRoom.getUserEmail(),
+                "/queue/chat-room-activated",
+                chatRoom
+        );
+    }
+
+    public List<ChatRoomDto> getChatRoomsByUserEmail(String email){
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmail(email);
 
         List<ChatRoomDto> chatRoomDtos = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {
             chatRoomDtos.add(chatRoomMapper.toDTO(chatRoom));
         }
         return chatRoomDtos;
+    }
+
+    public List<ChatRoomDto> getWaitingChatRooms() {
+        List<ChatRoom> waitingRooms = chatRoomRepository.findByStatus(ChatRoomStatus.WAITING);
+        return waitingRooms.stream()
+                .map(chatRoomMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
