@@ -48,11 +48,11 @@ public class CouponService {
 
     // 쿠폰 활성화/비활성화
     @Transactional
-    public Coupon updateCouponStatus(Long id, boolean isActive) {
+    public void useCoupon(Long id) {
         Coupon coupon = couponRepository.findById(id)
                 .orElseThrow(() -> new GlobalException(ErrorCode.COUPON_NOT_FOUND));
-        coupon.setActive(isActive);
-        return saveCoupon(coupon);
+        coupon.setActive(false);
+        couponRepository.save(coupon);
     }
 
     public Coupon saveCoupon(Coupon coupon) {

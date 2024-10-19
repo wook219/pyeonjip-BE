@@ -33,6 +33,12 @@ public class CouponController {
         couponService.deleteCouponById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @PostMapping("/use/{id}")
+    public ResponseEntity<Void> useCoupon(@PathVariable Long id){
+        couponService.useCoupon(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
 
 
