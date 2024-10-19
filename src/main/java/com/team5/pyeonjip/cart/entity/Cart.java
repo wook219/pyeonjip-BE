@@ -3,7 +3,9 @@ package com.team5.pyeonjip.cart.entity;
 import com.team5.pyeonjip.product.entity.Product;
 import com.team5.pyeonjip.product.entity.ProductDetail;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -17,10 +19,15 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId; // 사용자 식별
+    private String email; // 사용자 식별
 
     private Long optionId; // optionId가 있으면 productId도 필요없다.
 
     private Long quantity; // 사용자가 선택한 수량 (기본값 : 1)
 
+    public Cart(String email, Long optionId, Long quantity) {
+    }
+
+    public Cart() {
+    }
 }

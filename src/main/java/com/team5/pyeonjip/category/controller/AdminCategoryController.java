@@ -1,5 +1,6 @@
 package com.team5.pyeonjip.category.controller;
 
+import com.team5.pyeonjip.category.dto.CategoryCreateRequest;
 import com.team5.pyeonjip.category.dto.CategoryRequest;
 import com.team5.pyeonjip.category.dto.CategoryResponse;
 import com.team5.pyeonjip.category.service.CategoryService;
@@ -7,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,24 +23,25 @@ public class AdminCategoryController {
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable("categoryId") Long id,
                                                            @RequestBody CategoryRequest request) {
 
-        CategoryResponse category = categoryService.updateCategory(id, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(category);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(categoryService.updateCategory(id, request));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest request) {
+    @PostMapping()
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryCreateRequest request) {
 
-        CategoryResponse category = categoryService.createCategory(request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(category);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(categoryService.createCategory(request));
     }
 
-    @DeleteMapping("/{categoryId}")
-    public ResponseEntity<String> deleteCategory(@PathVariable("categoryId") Long id) {
+    @DeleteMapping
+    public ResponseEntity<Map<String, String>> deleteCategories(@RequestParam(required = false) List<Long> categoryIds) {
 
-        categoryService.deleteCategory(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body("카테고리가 삭제되었습니다.");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(categoryService.deleteCategories(categoryIds));
     }
+
 }

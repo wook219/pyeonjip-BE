@@ -1,77 +1,24 @@
 package com.team5.pyeonjip.category.service;
 
+import com.team5.pyeonjip.category.dto.CategoryCreateRequest;
 import com.team5.pyeonjip.category.dto.CategoryRequest;
 import com.team5.pyeonjip.category.dto.CategoryResponse;
-import com.team5.pyeonjip.category.entity.Category;
-import com.team5.pyeonjip.category.mapper.CategoryMapper;
-import com.team5.pyeonjip.category.repository.CategoryRepository;
-import com.team5.pyeonjip.category.utils.CategoryUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class CategoryService {
+public interface CategoryService {
 
-    private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
-    private final CategoryUtils categoryUtils;
+    // 카테고리 전체, 일부 조회
+    List<CategoryResponse> getCategories(List<Long> ids);
 
-    public List<CategoryResponse> newGetCategories() {
-        List<Category> allCategories = categoryRepository.findAll();
+    // 상위 카테고리 id로 자식 카테고리 id 리스트 조회
+    List<Long> getLeafCategoryIds(Long parentId);
 
-        List<Category> parentCategories = categoryUtils.getParentCategories(allCategories);
+    CategoryResponse updateCategory(Long id, CategoryRequest request);
 
-        return categoryUtils.createChildrenCategories(parentCategories, allCategories);
-    }
+    CategoryResponse createCategory(CategoryCreateRequest request);
 
-    @Transactional
-    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
+    Map<String, String> deleteCategories(List<Long> ids);
 
-        Category category = categoryUtils.findCategory(id);
 
-        categoryUtils.validateParent(id, request);
-
-        Integer newSort = categoryUtils.updateSiblingSort(request);
-
-        Category updatedCategory = category.toBuilder()
-                .id(id)
-                .name(request.getName() != null ? request.getName() : category.getName())
-                .sort(request.getSort() != null ? newSort : category.getSort())
-                .parentId(request.getParentId() != null ? request.getParentId() : null)
-                .build();
-
-        Category savedCategory = categoryRepository.save(updatedCategory);
-
-        return categoryMapper.toResponse(savedCategory);
-    }
-
-    @Transactional
-    public CategoryResponse createCategory(CategoryRequest request) {
-
-        Category category = categoryMapper.toEntity(request);
-
-        Category newCategory = categoryRepository.save(category);
-
-        return categoryMapper.toResponse(newCategory);
-    }
-
-    public void deleteCategory(Long id) {
-
-        categoryRepository.delete(categoryUtils.findCategory(id));
-    }
-
-    //NOTE: 미사용 코드( newGetCategories() 사용 중 )
-    public List<CategoryResponse> getCategories() {
-        List<Category> rootCategories = categoryRepository.findByParentIdIsNull();
-
-        return rootCategories.stream()
-                .map(categoryMapper::toResponse)
-                .toList();
-    }
 }

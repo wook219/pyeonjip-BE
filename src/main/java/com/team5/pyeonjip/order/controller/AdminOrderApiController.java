@@ -4,10 +4,10 @@ import com.team5.pyeonjip.order.dto.AdminOrderResponseDto;
 import com.team5.pyeonjip.order.enums.DeliveryStatus;
 import com.team5.pyeonjip.order.service.AdminOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,35 +18,34 @@ public class AdminOrderApiController {
 
     // 관리자 - 주문 전체 조회
     @GetMapping("/orders")
-    public ResponseEntity<List<AdminOrderResponseDto>> getAllOrders(){
-        // 전체 주문 목록 조회
-        List<AdminOrderResponseDto> orders = orderService.findAllOrders();
-        return ResponseEntity.ok(orders);
-    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<AdminOrderResponseDto>> getOrders(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField, // 기본 최신 순
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+            @RequestParam(value = "keyword", required = false) String keyword) {
 
-    // 관리자 - 특정 사용자 주문 조회
-    @GetMapping("/orders/search")
-    public ResponseEntity<List<AdminOrderResponseDto>> getOrdersByUserEmail(@RequestParam("userEmail") String userEmail) {
-        // 사용자 이메일로 조회
-        List<AdminOrderResponseDto> orders = orderService.findOrdersByUserEmail(userEmail);
+        Page<AdminOrderResponseDto> orders = orderService.findAllOrders(page, size, sortField, sortDir, keyword);
         return ResponseEntity.ok(orders);
     }
 
     // 관리자 - 주문 수정
-    @PatchMapping("order/{orderId}")
+    @PatchMapping("orders/{orderId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateDeliveryStatus(
             @PathVariable("orderId") Long orderId,
             @RequestParam("deliveryStatus") DeliveryStatus deliveryStatus) {
 
-        // 배송 상태 변경 처리
-        orderService.updateDeliveryStatus(orderId, deliveryStatus);
+        orderService.updateDeliveryStatus(orderId, deliveryStatus); // 배송 상태 변경 처리
         return ResponseEntity.ok().build();
     }
 
     // 관리자 - 주문 삭제
-    @DeleteMapping("order/{orderId}")
+    // TODO : soft delete
+    @DeleteMapping("orders/{orderId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteOrder(@PathVariable("orderId") Long orderId) {
-        // 주문 삭제 처리
         orderService.deleteOrderById(orderId);
         return ResponseEntity.ok().build();
     }
