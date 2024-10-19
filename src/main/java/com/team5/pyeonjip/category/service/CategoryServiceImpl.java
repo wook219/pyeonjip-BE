@@ -35,7 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
             List<Category> allCategories = categoryRepository.findAll();
             List<Category> parentCategories = categoryUtils.getParentCategories(allCategories);
 
-            return categoryUtils.createChildrenCategories(parentCategories, allCategories);
+            List<Category> resultCategories = categoryUtils.createChildrenCategories(parentCategories, allCategories);
+
+            return resultCategories.stream()
+                    .map(categoryMapper::toResponse)
+                    .toList();
 
         } else {
 

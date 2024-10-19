@@ -16,7 +16,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CategoryUtils {
 
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
     private  final ProductRepository productRepository;
     private final CategoryValidate categoryValidate;
@@ -30,18 +29,16 @@ public class CategoryUtils {
     }
 
     // 부모-자식 카테고리 연결
-    public List<CategoryResponse> createChildrenCategories(List<Category> parentCategories,
+    public List<Category> createChildrenCategories(List<Category> parentCategories,
                                                            List<Category> allCategories) {
 
         return parentCategories.stream()
                 .map(parent -> {
-                    List<CategoryResponse> children = allCategories.stream()
+                    List<Category> children = allCategories.stream()
                             .filter(child -> parent.getId().equals(child.getParentId()))
-                            .map(categoryMapper::toResponse)
                             .toList();
 
-                    // 부모 카테고리의 정보를 가진 CategoryResponse 객체를 생성
-                    return categoryMapper.toResponse(parent).toBuilder()
+                    return parent.toBuilder()
                             .children(children)
                             .build();
                 })
