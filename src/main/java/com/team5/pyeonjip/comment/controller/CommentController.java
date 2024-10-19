@@ -1,5 +1,6 @@
 package com.team5.pyeonjip.comment.controller;
 
+import com.team5.pyeonjip.comment.dto.CommentRatingProjection;
 import com.team5.pyeonjip.comment.entity.Comment;
 import com.team5.pyeonjip.comment.repository.CommentRepository;
 import com.team5.pyeonjip.comment.service.CommentService;
@@ -13,13 +14,18 @@ import java.util.List;
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
-    //private final CommentRepository commentRepository;
     private final CommentService commentService;
 
     // 제품 댓글 조회
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Comment>> getCommentsByProductId(@PathVariable("productId") Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentsByProductId(productId));
+    }
+
+    @GetMapping("/product-rating/{productId}")
+    public ResponseEntity<List<CommentRatingProjection>> getRatingsByProductId(@PathVariable("productId") Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getRatingsByCommentId(productId));
+
     }
 
     // 댓글 생성
