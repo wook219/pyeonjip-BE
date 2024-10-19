@@ -9,11 +9,13 @@ import com.team5.pyeonjip.user.mapper.UserMapper;
 import com.team5.pyeonjip.user.dto.UserUpdateDto;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -68,10 +70,10 @@ public class UserService {
 
 
     // 개인정보 변경
+    @Transactional
     public void updateUserInfo(String email, UserUpdateDto dto) {
 
 //      주소, 비밀번호 힌트 전부 null인 경우, 정보를 변경하지 않는다.
-        // Todo: DynamicUpdate 적용하기
         if (dto.getAddress() == null && dto.getPasswordHint() == null) {
             throw new GlobalException(ErrorCode.INVALID_USER_UPDATE);
         }
@@ -88,9 +90,21 @@ public class UserService {
         if (dto.getPasswordHint() != null) {
             foundUser.setPasswordHint(dto.getPasswordHint());
         }
+    }
 
-        // Todo: 마찬가지로 DynamicUpdate 사용 시 필요 없을수도.
-        userRepository.save(foundUser);
+
+    // 비밀번호 업데이트
+    @Transactional
+    public Boolean updatePassword(String email, String password) {
+
+        String newPassword = bCryptPasswordEncoder.encode(password);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+
+        user.setPassword(newPassword);
+
+        return true;
     }
 
 
@@ -112,7 +126,7 @@ public class UserService {
     // 계정 찾기
     public User findAccount(UserFindAccountDto dto) {
 
-        if (!checkUser(dto)) {
+        if (!checkUserForAccount(dto)) {
             return null;
         }
 
@@ -122,9 +136,16 @@ public class UserService {
 
 
     // 계정을 찾기 위한 본인 확인 메서드
-    private Boolean checkUser(UserFindAccountDto dto) {
+    private Boolean checkUserForAccount(UserFindAccountDto dto) {
 
         return userRepository.existsByNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber());
+    }
+
+
+    // 비밀번호 재설정 시 이름과 이메일에 해당되는 유저가 존재하는지 확인
+    public Boolean checkUserForReset(String name, String email) {
+
+        return userRepository.existsByNameAndEmail(name, email);
     }
 
 
@@ -144,5 +165,20 @@ public class UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+    }
+
+
+    public String getTempPassword() {
+        char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+
+        String tempPassword = "";
+
+        int idx = 0;
+        for (int i = 0; i < 10; i++) {
+            idx = (int) (charSet.length * Math.random());
+            tempPassword += charSet[idx];
+        }
+        return tempPassword;
     }
 }
