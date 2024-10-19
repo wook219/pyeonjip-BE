@@ -62,7 +62,7 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomDto activateChatRoom(Long chatRoomId, String adminEmail) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         if (chatRoom.getStatus() != ChatRoomStatus.WAITING) {
             throw new IllegalStateException("대기 중인 채팅방만 활성화할 수 있습니다.");

@@ -1,5 +1,7 @@
 package com.team5.pyeonjip.user.service;
 
+import com.team5.pyeonjip.global.exception.ErrorCode;
+import com.team5.pyeonjip.global.exception.GlobalException;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
 import com.team5.pyeonjip.user.entity.Refresh;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
@@ -20,7 +22,6 @@ public class ReissueService {
     private final RefreshRepository refreshRepository;
 
 
-    // Todo: 예외처리 추가하기
     // Access 토큰 재발급을 위한 컨트롤러
     public void reissueRefreshToken(HttpServletRequest request, HttpServletResponse response) {
 
@@ -38,8 +39,7 @@ public class ReissueService {
         // Refresh 토큰이 없는 경우
         if (refreshToken == null) {
 
-            return;
-            // throw new RefreshTokenNotFoundException("Refresh token is null.");
+            throw new GlobalException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         }
 
         // Refresh 토큰이 만료되었는지 확인
@@ -47,8 +47,7 @@ public class ReissueService {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
 
-            return;
-            // throw new RefreshTokenExpiredException("Refresh token is expired.");
+            throw new GlobalException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
 
         // Refresh 토큰인지 확인 (발급시 페이로드에 명시된다)
@@ -56,8 +55,7 @@ public class ReissueService {
 
         if (!category.equals("refresh")) {
 
-            return;
-            // throw new InvalidRefreshTokenException("Invalid refresh token.");
+            throw new GlobalException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         // Refresh 토큰이 DB에 저장되어 있는지 확인
@@ -65,8 +63,7 @@ public class ReissueService {
 
         if (!isExist) {
 
-            return;
-            // throw new InvalidRefreshTokenException("Invalid refresh token.");
+            throw new GlobalException(ErrorCode.REFRESH_TOKEN_NOT_SAVED);
         }
 
         /* 여기까지 Refresh 토큰 검증 로직 */

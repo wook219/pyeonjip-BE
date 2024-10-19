@@ -26,12 +26,12 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.ORDER_NOT_FOUND));
     }
 
-    // 주문 수정
+    // 주문 수정 - 배송 상태 변경
     @Transactional
     @Override
     public void updateDeliveryStatus(Long orderId, DeliveryStatus deliveryStatus) {
         Order order = findOrderById(orderId);
-        // 배송 상태 변경
+
         order.getDelivery().updateStatus(deliveryStatus);
         orderRepository.save(order);
     }
@@ -41,10 +41,10 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     @Override
     public void deleteOrderById(Long orderId) {
         Order order = findOrderById(orderId);
-        orderRepository.delete(order); // TODO: soft delete
+        orderRepository.delete(order);
     }
 
-    // 관리자 - 주문 전체 조회
+    //  주문 전체 조회
     @Transactional(readOnly = true)
     @Override
     public Page<AdminOrderResponseDto> findAllOrders(int page, int size, String sortField, String sortDir, String keyword) {
