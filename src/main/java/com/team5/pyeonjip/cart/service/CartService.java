@@ -24,7 +24,6 @@ import static com.team5.pyeonjip.global.exception.ErrorCode.*;
 @Slf4j
 public class CartService {
     private final CartRepository cartRepository;
-    private final ProductService productService;
     private final ProductDetailRepository productDetailRepository;
 
     // 조회
@@ -63,17 +62,12 @@ public class CartService {
             Cart updatedCart = cartRepository.save(existingCart);
             return convertToCartDto(updatedCart);
         } else {
-            try {
                 Cart newCart = new Cart();
                 newCart.setEmail(email);
                 newCart.setOptionId(cartDto.getOptionId());
                 newCart.setQuantity(cartDto.getQuantity());
                 cartRepository.save(newCart);
                 return convertToCartDto(newCart);
-            }
-            catch (Exception e) {
-                throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-            }
         }
     }
 
@@ -85,32 +79,20 @@ public class CartService {
         if (dto.getQuantity() > productDetail.getQuantity()) {
             throw new GlobalException(OUT_OF_STOCK);
         }
-        try {
             target.setQuantity(dto.getQuantity());
             cartRepository.save(target);
             return dto;
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
     public void deleteCartItemByEmailAndOptionId(String email, Long optionId) {
         cartRepository.findByEmailAndOptionId(email, optionId);
-        try {
             cartRepository.deleteByEmailAndOptionId(email, optionId);
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
     public void deleteAllCartItems(String email) {
-        try {
             cartRepository.deleteAllByEmail(email);
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
@@ -126,22 +108,14 @@ public class CartService {
             if (serverItem != null) {
                 // 서버에 아이템이 존재하면 수량 동기화
                 serverItem.setQuantity(localItem.getQuantity());
-                try {
-                    cartRepository.save(serverItem);
-                } catch (Exception e) {
-                    throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-                }
+                cartRepository.save(serverItem);
             } else {
                 // 서버에 없는 경우 새로 추가
                 Cart newCartItem = new Cart();
                 newCartItem.setEmail(email);
                 newCartItem.setOptionId(localItem.getOptionId());
                 newCartItem.setQuantity(localItem.getQuantity());
-                try {
-                    cartRepository.save(newCartItem);
-                } catch (Exception e) {
-                    throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-                }
+                cartRepository.save(newCartItem);
             }
         }
         return localCartItems;

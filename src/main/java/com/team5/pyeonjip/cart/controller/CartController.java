@@ -43,7 +43,6 @@ public class CartController {
     // 조회
     @GetMapping
     public ResponseEntity<List<CartDetailDto>> getCartItems(@RequestParam("email") String email) {
-        System.out.println("email : " + email);
         return ResponseEntity.status(HttpStatus.OK).body(cartService.mapCartDtosToCartDetails(cartService.getCartItemsByEmail(email)));
     }
 

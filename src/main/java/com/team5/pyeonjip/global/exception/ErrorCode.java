@@ -35,7 +35,6 @@ public enum ErrorCode {
     // 장바구니
     CART_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-01", "장바구니를 찾을 수 없습니다."),
     CART_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "CART-02", "유효하지 않은 수량입니다."),
-    CART_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CART-03", "장바구니 작업에 실패했습니다."),
 
     // 쿠폰
     INVALID_COUPON_CODE(HttpStatus.BAD_REQUEST, "COUPON-01", "유효하지 않은 쿠폰 코드입니다."),
