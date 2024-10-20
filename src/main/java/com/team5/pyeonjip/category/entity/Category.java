@@ -2,9 +2,14 @@ package com.team5.pyeonjip.category.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//@Setter
+//@DynamicUpdate
+// Setter 와 DynamicUpdate 활용해서 수정 값만 변경 가능. Dirty Checking 효율 UP
 
 @Entity
 @Getter
@@ -18,33 +23,26 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @ColumnDefault("999")
     private Integer sort; //낮을수록 먼저 반환
 
     @Column(name = "parent_id")
     private Long parentId;
 
-    @OneToMany
-    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Category> children = new ArrayList<>();
 
     @Builder(toBuilder = true)
-    public Category(Long id, String name, int sort, Long parentId, List<Category> children) {
+    public Category(Long id, String name, Integer sort, Long parentId) {
         this.id = id;
         this.name = name;
         this.sort = sort;
         this.parentId = parentId;
-        this.children = children;
     }
 
     // toString() 무한 재귀호출 방지
     @Override
     public String toString() {
         return String.format("Category(id=%d, name='%s')", id, name);
-    }
-
-    public void addChild(Category child) {
-        this.children.add(child);
-        child.parentId = this.id;
     }
 }

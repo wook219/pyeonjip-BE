@@ -34,6 +34,8 @@ public class Delivery extends BaseTimeEntity {
         this.status = DeliveryStatus.READY;
     }
 
+    // == 비즈니스 로직 == //
+
     // 배송 상태 변경 메서드
     public void updateStatus(DeliveryStatus newStatus) {
         this.status = newStatus;

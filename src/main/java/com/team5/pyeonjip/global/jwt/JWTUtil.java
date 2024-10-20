@@ -31,7 +31,6 @@ public class JWTUtil {
     }
 
 
-    // Todo: getEmail로 메서드명 수정해도 문제 없을지 고려해보기. 기존은 getUsername
     public String getEmail(String token) {
 
         return Jwts.parser()
@@ -43,7 +42,6 @@ public class JWTUtil {
     }
 
 
-    // Todo: Role을 ENUM으로 구현했기에 문제 생길 수도 있음.
     public String getRole(String token) {
 
         return Jwts.parser()
@@ -98,7 +96,7 @@ public class JWTUtil {
     public String createJwt(String category, String email, String role, Long expiredMs) {
 
         return Jwts.builder()
-                .setHeaderParam("typ", "JWP")
+                .setHeaderParam("typ", "JWT")
                 // 키에 대한 특정 데이터를 담는다.
                 .claim("category", category)
                 .claim("email", email)

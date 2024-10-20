@@ -1,14 +1,12 @@
 package com.team5.pyeonjip.order.controller;
 
-import com.team5.pyeonjip.order.dto.OrderRequestDto;
-import com.team5.pyeonjip.order.dto.OrderResponseDto;
+import com.team5.pyeonjip.order.dto.*;
 import com.team5.pyeonjip.order.service.OrderService;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,23 +20,20 @@ public class OrderApiController {
     private final UserService userService;
 
     // 사용자 - 주문 생성
-    @PostMapping("/order/create")
+    @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(
-            @Valid @RequestBody OrderRequestDto orderRequestDto)
-       //     @RequestParam("userId") Long userId){
-    {
-
-        Long userId = 1L; // 유저 테스트 Id
+            @RequestBody CombinedOrderDto combinedOrderDto,
+            @RequestParam("userEmail") String userEmail){
 
         // 주문 생성 처리
-        orderService.createOrder(orderRequestDto, userId);
+        orderService.createOrder(combinedOrderDto,userEmail);
 
         return ResponseEntity.ok().build();
     }
 
     // 사용자 - 주문 목록 조회(마이페이지)
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponseDto>> getUserOrders(@RequestParam("userId") Long userId) {
+    public ResponseEntity<List<OrderResponseDto>> getUserOrders(@RequestParam("userId") Long userId) { // @AuthenticationPrincipal User currentUser
 
         User user = userService.findUser(userId);
 
@@ -49,11 +44,18 @@ public class OrderApiController {
     }
 
     // 사용자 - 주문 취소
-    @PatchMapping("order/cancel/{orderId}")
-    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId) {
+    @PatchMapping("orders/{orderId}")
+    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId, @AuthenticationPrincipal User currentUser) {
         // 주문 취소 처리
         orderService.cancelOrder(orderId);
 
         return ResponseEntity.ok().build();
+    }
+
+    // 주문 데이터(장바구니)
+    @PostMapping("/orders/checkout")
+    public ResponseEntity<OrderCartResponseDto> getOrderSummary(@RequestBody OrderCartRequestDto orderCartRequestDto) {
+        OrderCartResponseDto summary = orderService.getOrderSummary(orderCartRequestDto);
+        return ResponseEntity.ok(summary);
     }
 }

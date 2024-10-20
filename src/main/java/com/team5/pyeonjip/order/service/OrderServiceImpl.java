@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductDetailRepository productDetailRepository;
     private final ProductDetailService productDetailService;
 
-    private ProductDetail findProductDetailById(Long productId) {
+    private ProductDetail findProductDetailById(Long productId) { // 주문을 동시에 하게 되면, 재고 이상으로 주문이 될 수 있다.
         return productDetailRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
     }
@@ -43,41 +43,51 @@ public class OrderServiceImpl implements OrderService {
     // 주문 생성
     @Transactional
     @Override
-    public void createOrder(OrderRequestDto orderRequestDto, Long userId) {
-        // 유저 조회
-        User user = userRepository.findById(userId)
+    public void createOrder(CombinedOrderDto combinedOrderDto, String userEmail) {
+
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
 
         // 배송 정보 생성
         Delivery delivery = Delivery.builder()
-                .address(orderRequestDto.getAddress())  // 전달된 주소 사용
+                .address(combinedOrderDto.getOrderRequestDto().getAddress())  // 전달된 주소 사용
                 .status(DeliveryStatus.READY)  // 기본 상태를 READY로 설정
                 .build();
         deliveryRepository.save(delivery);
 
-        Long cartTotalPrice = 100000L; // 장바구니 쿠폰 적용 후 가격 예시
+        // 장바구니 쿠폰 적용된 가격
+        Long cartTotalPrice = combinedOrderDto.getOrderCartRequestDto().getCartTotalPrice();
 
         // 전체 주문 금액
         Long totalPrice = calculateTotalPrice(user, cartTotalPrice);
 
         // 주문 생성
-        Order order = OrderMapper.toOrderEntity(orderRequestDto, delivery, user, totalPrice);
+        Order order = OrderMapper.toOrderEntity(combinedOrderDto.getOrderRequestDto(), delivery, user, totalPrice);
         orderRepository.save(order);
 
         // 주문 상세 정보 생성
-        orderRequestDto.getOrderDetails().forEach(orderDetailDto -> {
+        combinedOrderDto.getOrderRequestDto().getOrderDetails().forEach(orderDetailDto -> {
             ProductDetail productDetail = findProductDetailById(orderDetailDto.getProductDetailId());
 
             // 재고 수량 확인
             if (productDetail.getQuantity() < orderDetailDto.getQuantity()) {
                 throw new GlobalException(ErrorCode.OUT_OF_STOCK);
             }
-            orderDetailRepository.save(OrderMapper.toOrderDetailEntity(order, productDetail, orderDetailDto));
 
             // 주문 후 재고 수량 감소
             productDetail.setQuantity(productDetail.getQuantity() - orderDetailDto.getQuantity());
             productDetailRepository.save(productDetail);
+
+            // 주문 상세 저장
+            orderDetailRepository.save(OrderMapper.toOrderDetailEntity(order, productDetail, orderDetailDto));
         });
+
+        // 사용자의 총 구매 금액을 주문 후 계산
+        Long totalSpent = orderRepository.getTotalPriceByUser(user.getEmail());
+
+        // 사용자의 회원 등급 업데이트
+        updateUserGrade(user, totalSpent);
+        userRepository.save(user);
     }
 
     // 회원 등급에 따른 배송비 계산
@@ -98,6 +108,17 @@ public class OrderServiceImpl implements OrderService {
             case SILVER -> 0.05; // 5% 할인
             case BRONZE -> 0.0; // 할인 없음
         };
+    }
+
+    // 사용자 등급 업데이트 로직
+    private void updateUserGrade(User user, Long totalSpent) {
+        if (totalSpent >= 2000000) {
+            user.setGrade(Grade.GOLD);
+        } else if (totalSpent >= 1000000) {
+            user.setGrade(Grade.SILVER);
+        } else {
+            user.setGrade(Grade.BRONZE);
+        }
     }
 
     // 총 금액 계산
@@ -131,9 +152,10 @@ public class OrderServiceImpl implements OrderService {
     // 주문 취소
     @Transactional
     @Override
-    public void cancelOrder(Long orderId) {
+    public void cancelOrder(Long orderId) { // User authenticatedUser
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.ORDER_NOT_FOUND));
+        // .filter(order -> order.getUser().getUserId().equals(authenticatedUser.getUserId())) // 주문자 확인
 
         // 배송 상태가 READY인 경우에만 취소 가능
         if (order.getDelivery().getStatus() != DeliveryStatus.READY) {
@@ -147,5 +169,26 @@ public class OrderServiceImpl implements OrderService {
             ProductDetail productDetail = findProductDetailById(orderDetail.getProduct().getId());
             productDetailService.updateDetailQuantity(productDetail.getId(), orderDetail.getQuantity());
         });
+    }
+
+    // 장바구니 데이터 가공
+    @Override
+    public OrderCartResponseDto getOrderSummary(OrderCartRequestDto orderCartRequestDto) {
+
+        String userEmail = orderCartRequestDto.getEmail();
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
+
+        Long cartTotalPrice = orderCartRequestDto
+                .getCartTotalPrice();
+
+        double discountRate = calculateDiscountRate(user);
+        Long deliveryPrice = calculateDeliveryPrice(user);
+        Long totalPrice = Math.round(cartTotalPrice * (1 - discountRate)) + deliveryPrice;
+
+        List<OrderDetailDto> orderDetails = orderCartRequestDto.getOrderDetails();
+
+        return new OrderCartResponseDto(cartTotalPrice, totalPrice, deliveryPrice, discountRate, orderDetails);
     }
 }
