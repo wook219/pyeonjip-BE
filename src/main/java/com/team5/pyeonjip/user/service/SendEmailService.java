@@ -3,10 +3,9 @@ package com.team5.pyeonjip.user.service;
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
 import com.team5.pyeonjip.user.dto.MailDto;
-import com.team5.pyeonjip.user.repository.UserRepository;
+import com.team5.pyeonjip.user.dto.UserUpdatePasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailParseException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -28,18 +27,21 @@ public class SendEmailService {
             throw new GlobalException(ErrorCode.TEMP_PASSWORD_GENERATION_FAILED);
         }
 
-        MailDto dto = new MailDto();
-        dto.setAddress(email);
-        dto.setTitle(name + "님의 편집 임시비밀번호 안내 메일입니다.");
-        dto.setMessage("안녕하세요.\n편집 임시비밀번호 안내 관련 메일입니다.\n\n" + "[" + name + "]" +"님의 임시 비밀번호는 "
+        UserUpdatePasswordDto passwordDto = new UserUpdatePasswordDto();
+        passwordDto.setPassword(tempPassword);
+
+        MailDto mailDto = new MailDto();
+        mailDto.setAddress(email);
+        mailDto.setTitle(name + "님의 편집 임시비밀번호 안내 메일입니다.");
+        mailDto.setMessage("안녕하세요.\n편집 임시비밀번호 안내 관련 메일입니다.\n\n" + "[" + name + "]" +"님의 임시 비밀번호는 "
                 + tempPassword + " 입니다.");
 
         try {
-            userService.updatePassword(email, tempPassword);
+            userService.updateUserPassword(email, passwordDto);
         } catch (Exception e) {
             throw new GlobalException(ErrorCode.USER_UPDATE_FAILED);
         }
-        return dto;
+        return mailDto;
     }
 
 

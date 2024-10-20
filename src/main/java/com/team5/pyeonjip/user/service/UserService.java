@@ -2,11 +2,8 @@ package com.team5.pyeonjip.user.service;
 
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
-import com.team5.pyeonjip.user.dto.SignUpDto;
-import com.team5.pyeonjip.user.dto.UserFindAccountDto;
-import com.team5.pyeonjip.user.dto.UserInfoDto;
+import com.team5.pyeonjip.user.dto.*;
 import com.team5.pyeonjip.user.mapper.UserMapper;
-import com.team5.pyeonjip.user.dto.UserUpdateDto;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -71,40 +67,36 @@ public class UserService {
 
     // 개인정보 변경
     @Transactional
-    public void updateUserInfo(String email, UserUpdateDto dto) {
+    public void updateUserAddress(String email, UserUpdateAddressDto dto) {
 
-//      주소, 비밀번호 힌트 전부 null인 경우, 정보를 변경하지 않는다.
-        if (dto.getAddress() == null && dto.getPasswordHint() == null) {
+        if (dto.getAddress() == null) {
             throw new GlobalException(ErrorCode.INVALID_USER_UPDATE);
         }
 
         User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
-//      1. 주소만 변경하는 경우
-        if (dto.getAddress() != null) {
-            foundUser.setAddress(dto.getAddress());
-        }
+        String newAddress = dto.getAddress();
 
-//      2. 비밀번호 힌트만 변경하는 경우
-        if (dto.getPasswordHint() != null) {
-            foundUser.setPasswordHint(dto.getPasswordHint());
-        }
+        foundUser.setAddress(newAddress);
+
     }
 
 
     // 비밀번호 업데이트
     @Transactional
-    public Boolean updatePassword(String email, String password) {
+    public void updateUserPassword(String email, UserUpdatePasswordDto dto) {
 
-        String newPassword = bCryptPasswordEncoder.encode(password);
+        if (dto.getPassword() == null) {
+            throw new GlobalException(ErrorCode.INVALID_USER_UPDATE);
+        }
 
-        User user = userRepository.findByEmail(email)
+        User foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
-        user.setPassword(newPassword);
+        String newPassword = bCryptPasswordEncoder.encode(dto.getPassword());
 
-        return true;
+        foundUser.setPassword(newPassword);
     }
 
 
