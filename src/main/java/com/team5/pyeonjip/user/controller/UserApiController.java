@@ -57,19 +57,18 @@ public class UserApiController {
 
     // 유저 주소 변경
     @PutMapping("/address/{email}")
-    public ResponseEntity<Void> updateUserInfo(@PathVariable("email") String email, @RequestBody UserUpdateAddressDto addressDto) {
+    public ResponseEntity<Boolean> updateUserInfo(@PathVariable("email") String email, @RequestBody UserUpdateAddressDto addressDto) {
 
-        userService.updateUserAddress(email, addressDto);
-        return ResponseEntity.noContent().build();
+        boolean updateResult = userService.updateUserAddress(email, addressDto);
+        return ResponseEntity.ok(updateResult);
     }
 
 
     // 유저 비밀번호 변경
     @PutMapping("/password/{email}")
-    public ResponseEntity<Void> updateUserPassword(@PathVariable("email") String email, @RequestBody UserUpdatePasswordDto passwordDto) {
+    public ResponseEntity<Boolean> updateUserPassword(@PathVariable("email") String email, @RequestBody UserUpdatePasswordDto passwordDto) {
 
-        userService.updateUserPassword(email, passwordDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(userService.updateUserPassword(email, passwordDto));
     }
 
 

@@ -67,7 +67,7 @@ public class UserService {
 
     // 개인정보 변경
     @Transactional
-    public void updateUserAddress(String email, UserUpdateAddressDto dto) {
+    public Boolean updateUserAddress(String email, UserUpdateAddressDto dto) {
 
         if (dto.getAddress() == null) {
             throw new GlobalException(ErrorCode.INVALID_USER_UPDATE);
@@ -80,12 +80,13 @@ public class UserService {
 
         foundUser.setAddress(newAddress);
 
+        return true;
     }
 
 
     // 비밀번호 업데이트
     @Transactional
-    public void updateUserPassword(String email, UserUpdatePasswordDto dto) {
+    public Boolean updateUserPassword(String email, UserUpdatePasswordDto dto) {
 
         if (dto.getPassword() == null) {
             throw new GlobalException(ErrorCode.INVALID_USER_UPDATE);
@@ -97,6 +98,8 @@ public class UserService {
         String newPassword = bCryptPasswordEncoder.encode(dto.getPassword());
 
         foundUser.setPassword(newPassword);
+
+        return true;
     }
 
 
