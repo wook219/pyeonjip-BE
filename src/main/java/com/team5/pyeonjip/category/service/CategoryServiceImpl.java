@@ -104,7 +104,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         } else {
 
-            categoryUtils.deleteCategoriesAndUpdateProducts(ids);
+            List<Category> categories = categoryValidate.validateAndFindCategory(ids);
+            categoryUtils.deleteCategoriesAndUpdateProducts(categories);
+
             response.put("message", "카테고리가 삭제되었습니다.");
         }
 
