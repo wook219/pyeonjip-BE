@@ -1,13 +1,12 @@
 package com.team5.pyeonjip.comment.service;
 
+import com.team5.pyeonjip.comment.dto.CommentRatingProjection;
 import com.team5.pyeonjip.comment.entity.Comment;
 import com.team5.pyeonjip.comment.repository.CommentRepository;
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
-import com.team5.pyeonjip.global.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +17,12 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public List<Comment> getCommentsByProductId(Long productId) {
-        List<Comment> comments = commentRepository.findByProductId(productId);
-        if (comments.isEmpty()) {
-            throw new GlobalException(ErrorCode.COMMENT_NOT_FOUND);
-        }
-        return comments;
+        // 빈값도 허용을 해줘야 하기 때문에 예외처리 하면 안됨
+        return commentRepository.findByProductId(productId);
+    }
+
+    public List<CommentRatingProjection> getRatingsByCommentId(Long commentId) {
+        return commentRepository.findRatingByProductId(commentId);
     }
 
     @Transactional

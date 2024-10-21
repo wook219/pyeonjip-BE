@@ -43,11 +43,10 @@ public class CartController {
     // 조회
     @GetMapping
     public ResponseEntity<List<CartDetailDto>> getCartItems(@RequestParam("email") String email) {
-        System.out.println("email : " + email);
         return ResponseEntity.status(HttpStatus.OK).body(cartService.mapCartDtosToCartDetails(cartService.getCartItemsByEmail(email)));
     }
 
-    // 수정
+    // 수량 수정
     @PutMapping("/{optionId}")
     public ResponseEntity<CartDto> updateCartItemQuantity(
             @RequestParam("email") String email,
@@ -56,7 +55,7 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(cartService.updateCartItemQuantity(email, optionId, cartDto));
     }
 
-    // 개별 삭제
+    // 장바구니 항목 개별 삭제
     @DeleteMapping("/{optionId}")
     public ResponseEntity<Void> deleteCartItem(
             @RequestParam("email") String email,
@@ -65,7 +64,7 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // 전체 삭제
+    // 해당 유저 장바구니 전체 삭제
     @DeleteMapping
     public ResponseEntity<Void> deleteAllCartItems(@RequestParam("email") String email) {
             cartService.deleteAllCartItems(email);

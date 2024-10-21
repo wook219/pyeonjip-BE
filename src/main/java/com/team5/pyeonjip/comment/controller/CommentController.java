@@ -1,5 +1,6 @@
 package com.team5.pyeonjip.comment.controller;
 
+import com.team5.pyeonjip.comment.dto.CommentRatingProjection;
 import com.team5.pyeonjip.comment.entity.Comment;
 import com.team5.pyeonjip.comment.repository.CommentRepository;
 import com.team5.pyeonjip.comment.service.CommentService;
@@ -13,19 +14,27 @@ import java.util.List;
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
-    //private final CommentRepository commentRepository;
     private final CommentService commentService;
 
+    // 제품 댓글 조회
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Comment>> getCommentsByProductId(@PathVariable("productId") Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentsByProductId(productId));
     }
 
+    @GetMapping("/product-rating/{productId}")
+    public ResponseEntity<List<CommentRatingProjection>> getRatingsByProductId(@PathVariable("productId") Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getRatingsByCommentId(productId));
+
+    }
+
+    // 댓글 생성
     @PostMapping
     public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.saveComment(comment));
     }
 
+    // 댓글 업데이트
     @PutMapping("/{id}")
     public ResponseEntity<Comment> updateComment(
             @PathVariable Long id,
@@ -33,6 +42,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(id, updatedComment));
     }
 
+    // 댓글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
         commentService.deleteComment(id);
