@@ -26,11 +26,16 @@ public class CouponController {
     // 커스텀 쿠폰 생성 API
     @PostMapping("/custom")
     public ResponseEntity<Coupon> createCouponCustom(
-            @RequestParam String code,
-            @RequestParam Long discount,
-            @RequestParam LocalDateTime expiryDate) {
-        Coupon coupon = couponService.createCoupon(code, discount, expiryDate);
+            @RequestBody Coupon customCoupon) {
+        Coupon coupon = couponService.createCoupon(customCoupon);
         return ResponseEntity.status(HttpStatus.CREATED).body(coupon);
+    }
+
+    // 쿠폰 수정
+    @PutMapping
+    public ResponseEntity<Coupon> updateCoupon(
+            @RequestBody Coupon coupon) {
+        return ResponseEntity.status(HttpStatus.OK).body(couponService.updateCoupon(coupon));
     }
 
     // 쿠폰 목록 조회
