@@ -49,9 +49,9 @@ public class UserApiController {
 
     // 단일 유저 조회(이메일)
     @GetMapping("/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable("email") String email) {
-
-        return ResponseEntity.ok(userService.findUserByEmail(email));
+    public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable("email") String email) {
+        UserResponseDto userResponseDto = userService.findUserByEmail(email);
+        return ResponseEntity.ok(userResponseDto);
     }
 
 
