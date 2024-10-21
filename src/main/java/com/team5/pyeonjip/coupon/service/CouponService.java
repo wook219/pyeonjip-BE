@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,20 +31,14 @@ public class CouponService {
 
         validateDiscount(discount);
         validateCouponCode(coupon.getCode());
-        return saveCoupon(coupon);
+        return couponRepository.save(coupon);
     }
     // 사용자 지정 쿠폰 생성
     @Transactional
-    public Coupon createCoupon(String Code, Long discount, LocalDateTime expiryDate){
-        Coupon coupon = new Coupon();
-        coupon.setCode(Code);
-        coupon.setDiscount(discount);
-        coupon.setActive(true);
-        coupon.setExpiryDate(expiryDate);
-
-        validateDiscount(discount);
+    public Coupon createCoupon(Coupon coupon){
+        validateDiscount(coupon.getDiscount());
         validateCouponCode(coupon.getCode());
-        return saveCoupon(coupon);
+        return couponRepository.save(coupon);
     }
 
     // 쿠폰 활성화/비활성화
@@ -55,8 +50,13 @@ public class CouponService {
         couponRepository.save(coupon);
     }
 
-    public Coupon saveCoupon(Coupon coupon) {
-        return couponRepository.save(coupon);
+    public Coupon updateCoupon(Coupon coupon) {
+        Coupon target = couponRepository.findById(coupon.getId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.CART_NOT_FOUND));
+        target.setCode(coupon.getCode());
+        target.setDiscount(coupon.getDiscount());
+        target.setExpiryDate(coupon.getExpiryDate());
+        return couponRepository.save(target);
     }
 
     public List<Coupon> getAllCoupons() {
@@ -86,4 +86,6 @@ public class CouponService {
             throw new GlobalException(ErrorCode.INVALID_COUPON_CODE);
         }
     }
+
+
 }
