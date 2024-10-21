@@ -2,11 +2,8 @@ package com.team5.pyeonjip.user.service;
 
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
-import com.team5.pyeonjip.user.dto.SignUpDto;
-import com.team5.pyeonjip.user.dto.UserFindAccountDto;
-import com.team5.pyeonjip.user.dto.UserInfoDto;
+import com.team5.pyeonjip.user.dto.*;
 import com.team5.pyeonjip.user.mapper.UserMapper;
-import com.team5.pyeonjip.user.dto.UserUpdateDto;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -160,13 +156,19 @@ public class UserService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
     }
 
+    public UserResponseDto findUserByEmail(String email) {
 
-    public User findUserByEmail(String email) {
-
-        return userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-    }
 
+        return UserResponseDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .grade(user.getGrade())
+                .build();
+    }
 
     public String getTempPassword() {
         char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
