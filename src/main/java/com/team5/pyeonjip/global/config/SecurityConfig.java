@@ -112,9 +112,20 @@ public class SecurityConfig {
                         */
 
                         /* 장바구니 */
-                        //.requestMatchers("/api/cart/**").permitAll()                     // 1
-                        //.requestMatchers("/api/cart/**").authenticated()                 // 2
+                        .requestMatchers("/api/cart/**").permitAll()                     // 1
+                        .requestMatchers("/api/cart/sync").authenticated()                 // 2
                         //.requestMatchers("/api/cart/**").hasAnyRole("ADMIN", "USER")     // 3
+
+                        /*쿠폰*/
+                        .requestMatchers("/api/coupon/**").permitAll()
+                        .requestMatchers("api/coupon/custom/**").hasRole("ADMIN")
+
+                        /*댓글*/
+                        .requestMatchers("/api/comments/product/**").permitAll()
+                        .requestMatchers("/api/comments/product-rating/**").permitAll()
+                        .requestMatchers("/api/comments/**").authenticated()
+
+
 
                         /* 채팅 */
                         //.requestMatchers("/api/chat/**").permitAll()                      // 1
