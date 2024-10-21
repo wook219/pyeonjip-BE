@@ -28,7 +28,7 @@ public class AdminCategoryController {
                 .body(categoryService.updateCategory(id, request));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryCreateRequest request) {
 
         return ResponseEntity
