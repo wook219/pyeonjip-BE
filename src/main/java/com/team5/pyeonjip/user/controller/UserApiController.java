@@ -1,8 +1,6 @@
 package com.team5.pyeonjip.user.controller;
 
 import com.team5.pyeonjip.user.dto.*;
-import com.team5.pyeonjip.user.entity.User;
-import com.team5.pyeonjip.user.service.SendEmailService;
 import com.team5.pyeonjip.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserApiController {
 
     private final UserService userService;
-    private final SendEmailService sendEmailService;
 
 
     // 회원가입
@@ -78,38 +75,6 @@ public class UserApiController {
     public ResponseEntity<Void> deleteUser(@PathVariable("email") String email) {
 
         userService.deleteUser(email);
-        return ResponseEntity.ok().build();
-    }
-
-
-    // 계정 찾기
-    @GetMapping("/find")
-    public ResponseEntity<String> findAccount(@RequestParam String name, @RequestParam String phoneNumber) {
-
-        UserFindAccountDto dto = new UserFindAccountDto(name, phoneNumber);
-        User user = userService.findAccount(dto);
-
-        return ResponseEntity.ok(user.getEmail());
-    }
-
-
-    // 비밀번호 재설정
-//  1. DB에서 이메일과 이름이 일치하는지 확인하는 컨트롤러.
-    @PostMapping("/check/reset")
-    public ResponseEntity<ApiResponse<Boolean>> checkForResetPassword(@RequestBody ResetPasswordRequest dto) {
-
-        boolean isCorrect = userService.checkUserForReset(dto.getName(), dto.getEmail());
-        return ResponseEntity.ok(new ApiResponse<>(isCorrect));
-    }
-
-
-//  2. 등록된 이메일로 임시 비밀번호를 발송하고, 사용자의 비밀번호도 새로 업데이트한다.
-    @PostMapping("/check/reset/sendEmail")
-    public ResponseEntity<Void> sendEmail(@RequestBody ResetPasswordRequest dto) {
-
-        MailDto mailDto = sendEmailService.createMailAndChangePassword(dto.getEmail(), dto.getName());
-        sendEmailService.mailSend(mailDto);
-
         return ResponseEntity.ok().build();
     }
 
