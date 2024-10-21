@@ -35,7 +35,7 @@ public class UserAuthController {
 
     // 비밀번호 재설정
 //  1. DB에서 이메일과 이름이 일치하는지 확인하는 컨트롤러.
-    @PostMapping("/check/reset")
+    @PostMapping("/check")
     public ResponseEntity<ApiResponse<Boolean>> checkForResetPassword(@RequestBody ResetPasswordRequest dto) {
 
         boolean isCorrect = userService.checkUserForReset(dto.getName(), dto.getEmail());
@@ -44,7 +44,7 @@ public class UserAuthController {
 
 
     //  2. 등록된 이메일로 임시 비밀번호를 발송하고, 사용자의 비밀번호도 새로 업데이트한다.
-    @PostMapping("/check/reset/sendEmail")
+    @PostMapping("/check/reset")
     public ResponseEntity<Void> sendEmail(@RequestBody ResetPasswordRequest dto) {
 
         MailDto mailDto = sendEmailService.createMailAndChangePassword(dto.getEmail(), dto.getName());
