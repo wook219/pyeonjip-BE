@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AdminOrderResponseDto {
+    private Long id;
     private String userEmail; // 주문자 이메일
     private String userName; // 주문자 명
     private String phoneNumber; // 연락처
