@@ -24,6 +24,7 @@ public class Category {
     private String name;
 
     @ColumnDefault("999")
+    @Column(nullable = false)
     private Integer sort; //낮을수록 먼저 반환
 
     @Column(name = "parent_id")
@@ -33,16 +34,17 @@ public class Category {
     private List<Category> children = new ArrayList<>();
 
     @Builder(toBuilder = true)
-    public Category(Long id, String name, Integer sort, Long parentId) {
+    public Category(Long id, String name, Integer sort, Long parentId, List<Category> children) {
         this.id = id;
         this.name = name;
         this.sort = sort;
         this.parentId = parentId;
+        this.children = children;
     }
 
     // toString() 무한 재귀호출 방지
     @Override
     public String toString() {
-        return String.format("Category(id=%d, name='%s')", id, name);
+        return String.format("Category(id=%d, name='%s', sort='%d')", id, name, sort);
     }
 }
