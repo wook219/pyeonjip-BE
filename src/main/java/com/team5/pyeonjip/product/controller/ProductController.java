@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ProductController {
 
     // 1. 제품 생성
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
         ProductResponse productResponse = productService.createProduct(productRequest);
         return ResponseEntity.ok(productResponse);
@@ -33,6 +35,7 @@ public class ProductController {
 
     // 2. 제품 삭제
     @DeleteMapping("/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
@@ -40,6 +43,7 @@ public class ProductController {
 
     // 3. 제품 수정
     @PutMapping("/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest productRequest) {
         ProductResponse updatedProduct = productService.updateProduct(productId, productRequest);
         return ResponseEntity.ok(updatedProduct);
@@ -47,6 +51,7 @@ public class ProductController {
 
     // 4. 제품 디테일 생성
     @PostMapping("/{productId}/details")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDetail> createProductDetail(@PathVariable Long productId, @RequestBody ProductDetail productDetail) {
         ProductDetail createdDetail = productDetailService.createProductDetail(productId, productDetail);
         return ResponseEntity.ok(createdDetail);
@@ -54,6 +59,7 @@ public class ProductController {
 
     // 5. 제품 디테일 삭제
     @DeleteMapping("/details/{detailId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProductDetail(@PathVariable Long productId, @PathVariable Long detailId) {
         productDetailService.deleteProductDetail(productId, detailId);
         return ResponseEntity.noContent().build();
@@ -61,6 +67,7 @@ public class ProductController {
 
     // 6. 제품 디테일 수정
     @PutMapping("/details/{detailId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDetail> updateProductDetail(@PathVariable Long detailId, @RequestBody ProductDetail productDetail) {
         ProductDetail updatedDetail = productDetailService.updateProductDetail(detailId, productDetail);
         return ResponseEntity.ok(updatedDetail);
@@ -68,6 +75,7 @@ public class ProductController {
 
     // 7. 제품 이미지 생성
     @PostMapping("/{productId}/images")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductImage> createProductImage(@PathVariable Long productId, @RequestBody ProductImage productImage) {
         ProductImage createdImage = productImageService.createProductImage(productId, productImage);
         return ResponseEntity.ok(createdImage);
@@ -75,6 +83,7 @@ public class ProductController {
 
     // 8. 제품 이미지 삭제
     @DeleteMapping("/images/{imageId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProductImage(@PathVariable Long productId, @PathVariable Long imageId) {
         productImageService.deleteProductImage(productId, imageId);
         return ResponseEntity.noContent().build();
