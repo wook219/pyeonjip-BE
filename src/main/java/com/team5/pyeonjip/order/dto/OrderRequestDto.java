@@ -26,5 +26,5 @@ public class OrderRequestDto {
 
     private List<OrderDetailDto> orderDetails;
 
-    private Long userId;
+//    private Long userId;
 }

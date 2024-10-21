@@ -36,6 +36,7 @@ public class OrderMapper {
     // 관리자 : entity -> dto
     public static AdminOrderResponseDto toAdminOrderResponseDto(Order order) {
         return AdminOrderResponseDto.builder()
+                .id(order.getId())
                 .userEmail(order.getUser().getEmail())
                 .userName(order.getUser().getName())
                 .phoneNumber(order.getUser().getPhoneNumber())
