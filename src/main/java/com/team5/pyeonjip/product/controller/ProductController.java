@@ -27,14 +27,14 @@ public class ProductController {
 
     // CategoryId로 제품 목록 조회
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable("categoryId") Long categoryId) {
         List<ProductResponse> products = productService.getProductsByCategoryId(categoryId);
         return ResponseEntity.ok(products);
     }
 
     // ProductId로 단일 상품 조회
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable("productId") Long productId) {
         ProductResponse productResponse = productService.getProductById(productId);
         return ResponseEntity.ok(productResponse);
     }
@@ -55,14 +55,14 @@ public class ProductController {
 
     // ProductId로 옵션 목록 조회
     @GetMapping("/{productId}/details")
-    public ResponseEntity<List<ProductDetail>> getProductDetails(@PathVariable Long productId) {
+    public ResponseEntity<List<ProductDetail>> getProductDetails(@PathVariable("productId") Long productId) {
         List<ProductDetail> productDetails = productDetailService.getProductDetailsByProductId(productId);
         return ResponseEntity.ok(productDetails);
     }
 
     // 특정 옵션(디테일) 조회
     @GetMapping("/details/{detailId}")
-    public ResponseEntity<ProductDetail> getProductDetailById(@PathVariable Long detailId) {
+    public ResponseEntity<ProductDetail> getProductDetailById(@PathVariable("detailId") Long detailId) {
         ProductDetail productDetail = productDetailService.getProductDetailById(detailId);
         return ResponseEntity.ok(productDetail);
 
@@ -78,7 +78,7 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}/images")
-    public ResponseEntity<List<ProductImage>> getProductImages(@PathVariable Long productId) {
+    public ResponseEntity<List<ProductImage>> getProductImages(@PathVariable("productId") Long productId) {
         List<ProductImage> productImages = productService.getProductImagesByProductId(productId);
         return ResponseEntity.ok(productImages);
     }

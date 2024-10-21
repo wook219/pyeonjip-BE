@@ -34,50 +34,50 @@ public class AdminProductController {
 
     // 2. 제품 삭제
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable("productId") Long productId) {
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
     }
 
     // 3. 제품 수정
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable("productId") Long productId, @RequestBody ProductRequest productRequest) {
         ProductResponse updatedProduct = productService.updateProduct(productId, productRequest);
         return ResponseEntity.ok(updatedProduct);
     }
 
     // 4. 제품 디테일 생성
     @PostMapping("/{productId}/details")
-    public ResponseEntity<ProductDetail> createProductDetail(@PathVariable Long productId, @RequestBody ProductDetail productDetail) {
+    public ResponseEntity<ProductDetail> createProductDetail(@PathVariable("productId") Long productId, @RequestBody ProductDetail productDetail) {
         ProductDetail createdDetail = productDetailService.createProductDetail(productId, productDetail);
         return ResponseEntity.ok(createdDetail);
     }
 
     // 5. 제품 디테일 삭제
     @DeleteMapping("/details/{detailId}")
-    public ResponseEntity<Void> deleteProductDetail(@PathVariable Long productId, @PathVariable Long detailId) {
-        productDetailService.deleteProductDetail(productId, detailId);
+    public ResponseEntity<Void> deleteProductDetail(@PathVariable("detailId") Long detailId) {
+        productDetailService.deleteProductDetail(detailId);
         return ResponseEntity.noContent().build();
     }
 
     // 6. 제품 디테일 수정
     @PutMapping("/details/{detailId}")
-    public ResponseEntity<ProductDetail> updateProductDetail(@PathVariable Long detailId, @RequestBody ProductDetail productDetail) {
+    public ResponseEntity<ProductDetail> updateProductDetail(@PathVariable("detailId") Long detailId, @RequestBody ProductDetail productDetail) {
         ProductDetail updatedDetail = productDetailService.updateProductDetail(detailId, productDetail);
         return ResponseEntity.ok(updatedDetail);
     }
 
     // 7. 제품 이미지 생성
     @PostMapping("/{productId}/images")
-    public ResponseEntity<ProductImage> createProductImage(@PathVariable Long productId, @RequestBody ProductImage productImage) {
+    public ResponseEntity<ProductImage> createProductImage(@PathVariable("productId") Long productId, @RequestBody ProductImage productImage) {
         ProductImage createdImage = productImageService.createProductImage(productId, productImage);
         return ResponseEntity.ok(createdImage);
     }
 
     // 8. 제품 이미지 삭제
     @DeleteMapping("/images/{imageId}")
-    public ResponseEntity<Void> deleteProductImage(@PathVariable Long productId, @PathVariable Long imageId) {
-        productImageService.deleteProductImage(productId, imageId);
+    public ResponseEntity<Void> deleteProductImage(@PathVariable("imageId") Long imageId) {
+        productImageService.deleteProductImage(imageId);
         return ResponseEntity.noContent().build();
     }
 

@@ -61,7 +61,7 @@ public class ProductImageService {
 
     // 단일 이미지 삭제
     @Transactional
-    public void deleteProductImage(Long productId, Long imageId) {
+    public void deleteProductImage(Long imageId) {
         ProductImage productImage = productImageRepository.findById(imageId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_IMAGE_NOT_FOUND));
 
