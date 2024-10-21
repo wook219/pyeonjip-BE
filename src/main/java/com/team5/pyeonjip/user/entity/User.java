@@ -4,6 +4,7 @@ import com.team5.pyeonjip.chat.entity.ChatRoom;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -31,7 +32,8 @@ public class User {
     private String name;
 
     @NotNull
-    @Column(name = "phone_number", nullable = false)
+    @Size(min = 11, max = 11, message = "전화번호는 정확히 11자리여야 합니다.")  // 전화번호는 11자로 제한
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
     @NotNull

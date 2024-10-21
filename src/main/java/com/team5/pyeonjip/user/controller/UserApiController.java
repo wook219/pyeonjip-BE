@@ -4,6 +4,7 @@ import com.team5.pyeonjip.user.dto.*;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.SendEmailService;
 import com.team5.pyeonjip.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserApiController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody SignUpDto dto) {
+    public ResponseEntity<String> signUp(@Valid @RequestBody SignUpDto dto) {
 
         boolean isSignUpSuccessful = userService.signUpProcess(dto);
         if (isSignUpSuccessful) {
