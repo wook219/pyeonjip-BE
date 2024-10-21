@@ -1,11 +1,9 @@
 package com.team5.pyeonjip.order.controller;
 
-import com.team5.pyeonjip.order.dto.OrderRequestDto;
-import com.team5.pyeonjip.order.dto.OrderResponseDto;
+import com.team5.pyeonjip.order.dto.*;
 import com.team5.pyeonjip.order.service.OrderService;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,15 +22,11 @@ public class OrderApiController {
     // 사용자 - 주문 생성
     @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(
-            @Valid @RequestBody OrderRequestDto orderRequestDto, @RequestParam("userId") Long userId){
-            // @AuthenticationPrincipal User currentUser) {
-
-        // Long userId = currentUser.getId();
-
-        User user = userService.findUser(userId);
+            @RequestBody CombinedOrderDto combinedOrderDto,
+            @RequestParam("userEmail") String userEmail){
 
         // 주문 생성 처리
-        orderService.createOrder(orderRequestDto, user.getId());
+        orderService.createOrder(combinedOrderDto,userEmail);
 
         return ResponseEntity.ok().build();
     }
@@ -42,7 +36,6 @@ public class OrderApiController {
     public ResponseEntity<List<OrderResponseDto>> getUserOrders(@RequestParam("userId") Long userId) { // @AuthenticationPrincipal User currentUser
 
         User user = userService.findUser(userId);
-        // User user = currentUser.getId();
 
         // 사용자별 주문 목록 조회
         List<OrderResponseDto> orderList = orderService.findOrdersByUserId(user.getId());
@@ -57,5 +50,12 @@ public class OrderApiController {
         orderService.cancelOrder(orderId);
 
         return ResponseEntity.ok().build();
+    }
+
+    // 주문 데이터(장바구니)
+    @PostMapping("/orders/checkout")
+    public ResponseEntity<OrderCartResponseDto> getOrderSummary(@RequestBody OrderCartRequestDto orderCartRequestDto) {
+        OrderCartResponseDto summary = orderService.getOrderSummary(orderCartRequestDto);
+        return ResponseEntity.ok(summary);
     }
 }

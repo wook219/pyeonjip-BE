@@ -5,6 +5,7 @@ import com.team5.pyeonjip.global.jwt.JWTFilter;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
 import com.team5.pyeonjip.global.jwt.LoginFilter;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
+import com.team5.pyeonjip.user.service.ReissueService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final ReissueService reissueService;
 
 
     @Bean
@@ -72,6 +74,7 @@ public class SecurityConfig {
                                 // 허용 시간
                                 configuration.setMaxAge(3600L);
 
+                                // Authorization 헤더 노출
                                 configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                                 return configuration;
@@ -93,9 +96,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/signup").permitAll()
-                        .requestMatchers("/admin").hasAnyAuthority("ROLE_ADMIN")
+                        // 관리자만 접근 가능
+                        //.requestMatchers("/admin/**").hasRole("ADMIN")
+                        //.requestMatchers("/api/admin").hasRole("ADMIN")
+                        // 로그인 한 사용자만 접근 가능
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/reissue").permitAll()
+                        .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
+
+                        // 토큰 리이슈
+                        .requestMatchers("/api/user/reissue").permitAll()
                         // 개발 편의를 위해 전체 허용
                         .anyRequest().permitAll());
 //                        .anyRequest().authenticated());
@@ -106,7 +116,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 //      LoginFilter
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, reissueService), UsernamePasswordAuthenticationFilter.class);
 //      LogoutFilter
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);

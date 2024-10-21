@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder
 @ToString
+@Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CategoryResponse {
 
     private Long id;
