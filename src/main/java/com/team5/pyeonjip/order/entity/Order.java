@@ -54,13 +54,6 @@ public class Order extends BaseTimeEntity {
 
     // == 비즈니스 로직 == //
 
-    // 주문 시 최종 금액
-    public Long getTotalPrice(){
-        return orderDetails.stream()
-                .mapToLong(detail -> detail.getProductPrice() * detail.getQuantity())
-                .sum();
-    }
-
     // 주문 상태 변경 메서드
     public void updateStatus(OrderStatus status) {
         this.status = status;
