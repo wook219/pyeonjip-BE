@@ -1,9 +1,7 @@
 package com.team5.pyeonjip.category.utils;
 
 import com.team5.pyeonjip.category.dto.CategoryRequest;
-import com.team5.pyeonjip.category.dto.CategoryResponse;
 import com.team5.pyeonjip.category.entity.Category;
-import com.team5.pyeonjip.category.mapper.CategoryMapper;
 import com.team5.pyeonjip.category.repository.CategoryRepository;
 import com.team5.pyeonjip.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +14,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CategoryUtils {
 
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
     private  final ProductRepository productRepository;
-    private final CategoryValidate categoryValidate;
 
     // 최상위 카테고리만 조회
     public List<Category> getParentCategories(List<Category> allCategories) {
@@ -30,18 +26,16 @@ public class CategoryUtils {
     }
 
     // 부모-자식 카테고리 연결
-    public List<CategoryResponse> createChildrenCategories(List<Category> parentCategories,
+    public List<Category> createChildrenCategories(List<Category> parentCategories,
                                                            List<Category> allCategories) {
 
         return parentCategories.stream()
                 .map(parent -> {
-                    List<CategoryResponse> children = allCategories.stream()
+                    List<Category> children = allCategories.stream()
                             .filter(child -> parent.getId().equals(child.getParentId()))
-                            .map(categoryMapper::toResponse)
                             .toList();
 
-                    // 부모 카테고리의 정보를 가진 CategoryResponse 객체를 생성
-                    return categoryMapper.toResponse(parent).toBuilder()
+                    return parent.toBuilder()
                             .children(children)
                             .build();
                 })
@@ -109,9 +103,7 @@ public class CategoryUtils {
     }
 
     // 카테고리 삭제 후, 연관된 프로덕트에 null 적용
-    public void deleteCategoriesAndUpdateProducts(List<Long> ids) {
-
-        List<Category> categories = categoryValidate.validateAndFindCategory(ids);
+    public void deleteCategoriesAndUpdateProducts(List<Category> categories) {
 
         categories.forEach(category -> {
             productRepository.findByCategoryId(category.getId()).forEach(product -> {

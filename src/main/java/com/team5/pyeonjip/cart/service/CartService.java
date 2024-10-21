@@ -8,7 +8,6 @@ import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
 import com.team5.pyeonjip.product.entity.ProductDetail;
 import com.team5.pyeonjip.product.repository.ProductDetailRepository;
-import com.team5.pyeonjip.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import static com.team5.pyeonjip.global.exception.ErrorCode.*;
 @Slf4j
 public class CartService {
     private final CartRepository cartRepository;
-    private final ProductService productService;
     private final ProductDetailRepository productDetailRepository;
 
     // 조회
@@ -63,17 +61,12 @@ public class CartService {
             Cart updatedCart = cartRepository.save(existingCart);
             return convertToCartDto(updatedCart);
         } else {
-            try {
                 Cart newCart = new Cart();
                 newCart.setEmail(email);
                 newCart.setOptionId(cartDto.getOptionId());
                 newCart.setQuantity(cartDto.getQuantity());
                 cartRepository.save(newCart);
                 return convertToCartDto(newCart);
-            }
-            catch (Exception e) {
-                throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-            }
         }
     }
 
@@ -85,39 +78,26 @@ public class CartService {
         if (dto.getQuantity() > productDetail.getQuantity()) {
             throw new GlobalException(OUT_OF_STOCK);
         }
-
-        try {
             target.setQuantity(dto.getQuantity());
             cartRepository.save(target);
             return dto;
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
     public void deleteCartItemByEmailAndOptionId(String email, Long optionId) {
         cartRepository.findByEmailAndOptionId(email, optionId);
-        try {
             cartRepository.deleteByEmailAndOptionId(email, optionId);
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
     public void deleteAllCartItems(String email) {
-        try {
             cartRepository.deleteAllByEmail(email);
-        } catch (Exception e) {
-            throw new GlobalException(ErrorCode.CART_OPERATION_FAILED);
-        }
     }
 
     @Transactional
     public List<CartDto> sync(String email, List<CartDto> localCartItems) {
         Map<Long, Cart> serverItemMap = cartRepository.findAllByEmail(email)
-                .orElseThrow(() -> new GlobalException(CART_ITEM_NOT_FOUND))
+                .orElseThrow(() -> new GlobalException(CART_NOT_FOUND))
                 .stream()
                 .collect(Collectors.toMap(Cart::getOptionId, Function.identity()));
         // 로컬 카트 아이템을 순회하여 동기화
@@ -127,24 +107,14 @@ public class CartService {
             if (serverItem != null) {
                 // 서버에 아이템이 존재하면 수량 동기화
                 serverItem.setQuantity(localItem.getQuantity());
-                try {
-                    cartRepository.save(serverItem);
-                } catch (Exception e) {
-                    // 로깅 및 예외 처리
-                    log.error("Failed to save cart item: {}", localItem.getOptionId(), e);
-                }
+                cartRepository.save(serverItem);
             } else {
                 // 서버에 없는 경우 새로 추가
                 Cart newCartItem = new Cart();
                 newCartItem.setEmail(email);
                 newCartItem.setOptionId(localItem.getOptionId());
                 newCartItem.setQuantity(localItem.getQuantity());
-                try {
-                    cartRepository.save(newCartItem);
-                } catch (Exception e) {
-                    // 로깅 및 예외 처리
-                    log.error("Failed to create new cart item: {}", localItem.getOptionId(), e);
-                }
+                cartRepository.save(newCartItem);
             }
         }
         return localCartItems;
