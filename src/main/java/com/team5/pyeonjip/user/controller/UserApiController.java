@@ -9,9 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 @RestController
@@ -58,12 +55,20 @@ public class UserApiController {
     }
 
 
-    // 유저 정보 업데이트
-    @PutMapping("/{email}")
-    public ResponseEntity<Void> updateUserInfo(@PathVariable("email") String email, @RequestBody UserUpdateDto dto) {
+    // 유저 주소 변경
+    @PutMapping("/address/{email}")
+    public ResponseEntity<Boolean> updateUserInfo(@PathVariable("email") String email, @RequestBody UserUpdateAddressDto addressDto) {
 
-        userService.updateUserInfo(email, dto);
-        return ResponseEntity.noContent().build();
+        boolean updateResult = userService.updateUserAddress(email, addressDto);
+        return ResponseEntity.ok(updateResult);
+    }
+
+
+    // 유저 비밀번호 변경
+    @PutMapping("/password/{email}")
+    public ResponseEntity<Boolean> updateUserPassword(@PathVariable("email") String email, @RequestBody UserUpdatePasswordDto passwordDto) {
+
+        return ResponseEntity.ok(userService.updateUserPassword(email, passwordDto));
     }
 
 
