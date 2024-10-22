@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // 회원가입 시, 이메일이 중복되는지 확인
+    // 회원가입 시, 이메일, 전화번호가 중복되는지 확인
     Boolean existsByEmail(String email);
+    Boolean existsByPhoneNumber(String phoneNumber);
 
 
     // 로그인 시, DB에서 유저 정보를 조회

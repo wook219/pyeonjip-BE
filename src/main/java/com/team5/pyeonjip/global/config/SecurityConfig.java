@@ -1,5 +1,7 @@
 package com.team5.pyeonjip.global.config;
 
+import com.team5.pyeonjip.global.exception.JWTAccessDeniedHandler;
+import com.team5.pyeonjip.global.exception.JWTAuthenticationEntryPoint;
 import com.team5.pyeonjip.global.jwt.CustomLogoutFilter;
 import com.team5.pyeonjip.global.jwt.JWTFilter;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
@@ -33,7 +35,8 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final ReissueService reissueService;
-
+    private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -92,6 +95,11 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
+        http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 인증 실패 처리
+                        .accessDeniedHandler(jwtAccessDeniedHandler));
+
         // 경로별 인가
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -109,20 +117,20 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart/sync").authenticated()                 // 2
                         //.requestMatchers("/api/cart/**").hasAnyRole("ADMIN", "USER")     // 3
 
-                        /*쿠폰*/
+                        /* 쿠폰 */
                         .requestMatchers("/api/coupon/**").permitAll()
                         .requestMatchers("/api/coupon/custom/**").hasRole("ADMIN")
 
-                        /*댓글*/
+                        /* 댓글 */
                         .requestMatchers("/api/comments/product/**").permitAll()
                         .requestMatchers("/api/comments/product-rating/**").permitAll()
                         //.requestMatchers("/api/comments/**").authenticated()
 
-                        /* 채팅 - 미정으로 permitAll() */
-                        .requestMatchers("/api/chat/**").permitAll()                      // 1
+                        /* 채팅 */
+                        .requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/chat/waiting-room").hasRole("USER")
                         .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
-                        //.requestMatchers("/api/chat/**").hasRole("USER")                  // 2
-                        //.requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "USER")      // 3
+                        .requestMatchers("/api/chat/activate-room").hasRole("ADMIN")
 
                         /* 카테고리 */
                         .requestMatchers("/api/category/**").permitAll()
@@ -131,9 +139,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/orders/**").permitAll()
 
                         /* 유저 - 임시 전체 허용 */
-                        .requestMatchers("/api/user/**").permitAll()                      // 1
+//                        .requestMatchers("/api/user/**").permitAll()                      // 1
                         //.requestMatchers("/api/user/**").hasRole("USER")                  // 2
                         //.requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")      // 3
+                        .requestMatchers("/api/user/**").permitAll()                      // 1
 
                         /* 상품 */
                         .requestMatchers("/api/product/**").permitAll()

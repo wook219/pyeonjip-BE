@@ -31,7 +31,7 @@ public class UserApiController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public ResponseEntity<UserInfoDto> mypage(@RequestParam String email) {
+    public ResponseEntity<UserInfoDto> mypage(@RequestParam("email") String email) {
 
         return ResponseEntity.ok(userService.getUserInfo(email));
     }

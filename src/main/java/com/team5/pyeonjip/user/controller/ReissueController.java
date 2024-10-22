@@ -24,15 +24,8 @@ public class ReissueController {
     @PostMapping("/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
 
-        try {
-            reissueService.reissueRefreshToken(request, response);
-            return ResponseEntity.noContent().build();
-
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
-
-        }
+        reissueService.reissueRefreshToken(request, response);
+        return ResponseEntity.ok().build();
     }
 
 }
