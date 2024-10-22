@@ -15,6 +15,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +30,8 @@ public class ChatRoomService {
     private final UserRepository userRepository;
     private final ChatRoomMapper chatRoomMapper;
     private final SimpMessagingTemplate messagingTemplate;
+
+
 
 
     public List<ChatRoomDto> getChatRooms(){
@@ -95,7 +100,12 @@ public class ChatRoomService {
     public ChatRoomDto closeChatRoom(Long chatRoomId){
         ChatRoom room = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
         room.setStatus(ChatRoomStatus.CLOSED);
+
+        LocalDateTime now = LocalDateTime.now();
+        Timestamp currentTime = Timestamp.valueOf(now);
+        room.setClosedAt(currentTime);
 
         ChatRoom closedChatRoom = chatRoomRepository.save(room);
         return chatRoomMapper.toDTO(closedChatRoom);
