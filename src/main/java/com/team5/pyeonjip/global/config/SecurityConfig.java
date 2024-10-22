@@ -123,7 +123,7 @@ public class SecurityConfig {
                         /*댓글*/
                         .requestMatchers("/api/comments/product/**").permitAll()
                         .requestMatchers("/api/comments/product-rating/**").permitAll()
-                        .requestMatchers("/api/comments/**").authenticated()
+                        //.requestMatchers("/api/comments/**").authenticated()
 
 
 
