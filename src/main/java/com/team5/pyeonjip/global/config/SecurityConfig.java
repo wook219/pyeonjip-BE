@@ -1,5 +1,7 @@
 package com.team5.pyeonjip.global.config;
 
+import com.team5.pyeonjip.global.exception.JWTAccessDeniedHandler;
+import com.team5.pyeonjip.global.exception.JWTAuthenticationEntryPoint;
 import com.team5.pyeonjip.global.jwt.CustomLogoutFilter;
 import com.team5.pyeonjip.global.jwt.JWTFilter;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
@@ -33,7 +35,8 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final ReissueService reissueService;
-
+    private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -92,6 +95,11 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
+        http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 인증 실패 처리
+                        .accessDeniedHandler(jwtAccessDeniedHandler));
+
         // 경로별 인가
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -131,9 +139,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/orders/**").permitAll()
 
                         /* 유저 - 임시 전체 허용 */
-                        .requestMatchers("/api/user/**").permitAll()                      // 1
+//                        .requestMatchers("/api/user/**").permitAll()                      // 1
                         //.requestMatchers("/api/user/**").hasRole("USER")                  // 2
                         //.requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")      // 3
+                        .requestMatchers("/api/user/**").authenticated()                      // 1
 
                         /* 상품 */
                         .requestMatchers("/api/product/**").permitAll()
