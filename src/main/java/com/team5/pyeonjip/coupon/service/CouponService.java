@@ -56,6 +56,7 @@ public class CouponService {
         target.setCode(coupon.getCode());
         target.setDiscount(coupon.getDiscount());
         target.setExpiryDate(coupon.getExpiryDate());
+        target.setActive(coupon.isActive());
         return couponRepository.save(target);
     }
 

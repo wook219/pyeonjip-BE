@@ -9,6 +9,7 @@ import com.team5.pyeonjip.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +24,7 @@ public class ChatController {
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     // userId에 따른 채팅이력 리스트
     @GetMapping("/chat-room-list/{email}")
@@ -48,12 +50,23 @@ public class ChatController {
     // 관리자용: 채팅방 활성화
     @PostMapping("/activate-room/{chatRoomId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ChatRoomDto> activateChatRoom(@PathVariable Long chatRoomId, Authentication authentication) {
+    public ResponseEntity<ChatRoomDto> activateChatRoom(@PathVariable("chatRoomId") Long chatRoomId, Authentication authentication) {
         CustomUserDetails admin = (CustomUserDetails) authentication.getPrincipal();
         String adminEmail = admin.getUsername(); // CustomUserDetails에서는 getUsername()이 이메일을 반환합니다.
 
         ChatRoomDto activatedRoom = chatRoomService.activateChatRoom(chatRoomId, adminEmail);
         return ResponseEntity.ok(activatedRoom);
+    }
+
+    @PostMapping("/close-room/{chatRoomId}")
+    public ResponseEntity<?> closeChatRoom(@PathVariable("chatRoomId") Long chatRoomId) {
+        try {
+            ChatRoomDto closedRoom = chatRoomService.closeChatRoom(chatRoomId);
+            messagingTemplate.convertAndSend("/topic/chat-room-closed/" + chatRoomId, closedRoom);
+            return ResponseEntity.ok(closedRoom);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to close chat room: " + e.getMessage());
+        }
     }
 
     @GetMapping("/waiting-rooms")
