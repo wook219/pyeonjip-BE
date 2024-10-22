@@ -35,7 +35,7 @@ public class OrderMapper {
     }
 
     // 관리자 : entity -> dto
-    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order) {
+    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order, Long deliveryPrice, double discountRate) {
         return AdminOrderResponseDto.builder()
                 .id(order.getId())
                 .userEmail(order.getUser().getEmail())
@@ -45,6 +45,8 @@ public class OrderMapper {
                 .totalPrice(order.getTotalPrice()) // 전체 주문 금액
                 .createdAt(order.getCreatedAt())
                 .deliveryStatus(order.getDelivery().getStatus())
+                .deliveryPrice(deliveryPrice) // 배송비 추가
+                .discountRate(discountRate) // 할인율 추가
                 .orderDetails(order.getOrderDetails().stream()
                         .map(detail -> OrderDetailDto.builder()
                                 .productDetailId(detail.getId())

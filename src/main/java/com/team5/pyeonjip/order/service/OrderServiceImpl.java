@@ -95,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 회원 등급에 따른 배송비 계산
-    private Long calculateDeliveryPrice(User user) {
+    public Long calculateDeliveryPrice(User user) {
         // 기본 배송비 3000원
         long deliveryPrice = 3000L;
 
@@ -106,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 회원 등급에 따른 할인율 계산
-    private double calculateDiscountRate(User user) {
+    public double calculateDiscountRate(User user) {
         return switch (user.getGrade()) {
             case GOLD -> 0.1; // 10% 할인
             case SILVER -> 0.05; // 5% 할인
@@ -126,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 총 금액 계산
-    private Long calculateTotalPrice(User user, Long cartTotalPrice) {
+    public Long calculateTotalPrice(User user, Long cartTotalPrice) {
         // 1. 회원 등급에 따른 할인율 계산
         double discountRate = calculateDiscountRate(user);
 
