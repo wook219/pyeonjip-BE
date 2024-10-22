@@ -20,8 +20,10 @@ public class AdminOrderResponseDto {
     private OrderStatus orderStatus; // 기본 ORDER
     private Long totalPrice; // 결제 금액
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy. MM. dd HH:mm:ss")
     private Timestamp createdAt; // 생성 일
     private DeliveryStatus deliveryStatus; // 배송 상태
     private List<OrderDetailDto> orderDetails; // 상품 명, 상품 수량
+    private Long deliveryPrice; // 배송비
+    private double discountRate; // 할인율
 }
