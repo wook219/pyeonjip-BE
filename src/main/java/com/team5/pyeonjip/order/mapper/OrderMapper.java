@@ -20,6 +20,7 @@ public class OrderMapper {
                 .orderStatus(order.getStatus())
                 .deliveryStatus(order.getDelivery().getStatus())
                 .createdAt(order.getCreatedAt())
+                .totalPrice(order.getTotalPrice())
                 .orderDetails(order.getOrderDetails().stream()
                         .map(detail -> OrderDetailDto.builder()
                                 .productDetailId(detail.getProduct().getId())
@@ -48,6 +49,7 @@ public class OrderMapper {
                         .map(detail -> OrderDetailDto.builder()
                                 .productDetailId(detail.getId())
                                 .productName(detail.getProductName())
+                                .productDetailName(detail.getProductDetailName())
                                 .subTotalPrice(detail.getSubTotalPrice()) // 상품 상세 수량 * 가격
                                 .quantity(detail.getQuantity())
                                 .productPrice(detail.getProductPrice()) // 개당 가격
