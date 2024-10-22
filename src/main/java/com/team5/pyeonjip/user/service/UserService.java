@@ -119,14 +119,16 @@ public class UserService {
 
 
     // 계정 찾기
-    public User findAccount(UserFindAccountDto dto) {
+    public UserFoundAccountDto findAccount(UserFindAccountDto dto) {
 
         if (!checkUserForAccount(dto)) {
             return null;
         }
 
-        return userRepository.findByNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
-                .orElseThrow(() -> new GlobalException(ErrorCode.ACCOUNT_NOT_FOUND));
+        User foundUser = userRepository.findByNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
+                .orElseThrow(() -> new GlobalException(ErrorCode.ACCOUNT_NOT_FOUND));;
+
+        return new UserFoundAccountDto(foundUser.getEmail());
     }
 
 
