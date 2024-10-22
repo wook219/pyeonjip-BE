@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -18,7 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.email LIKE %:userEmail%")
     Page<Order> findOrdersByUserEmail(@Param("userEmail") String userEmail, Pageable pageable); // 사용자 이메일로 주문 조회
 
-    List<Order> findOrdersByUserId(Long userId); // 사용자 ID로 모든 주문 조회
+    Page<Order> findOrdersByUserId(Long userId, Pageable pageable); // 사용자 ID로 모든 주문 조회
 
     // 사용자의 모든 주문 금액 합산
     @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.user.email = :userEmail")

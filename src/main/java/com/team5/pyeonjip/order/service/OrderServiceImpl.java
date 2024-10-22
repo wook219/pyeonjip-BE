@@ -19,6 +19,10 @@ import com.team5.pyeonjip.user.entity.Grade;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -136,17 +140,17 @@ public class OrderServiceImpl implements OrderService {
     // 주문 조회
     @Transactional(readOnly = true)
     @Override
-    public List<OrderResponseDto> findOrdersByUserId(Long userId) {
-        // 사용자 ID로 주문 목록 조회
-        List<Order> orders = orderRepository.findOrdersByUserId(userId);
+    public Page<OrderResponseDto> findOrdersByUserId(Long userId, int page, int size, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equalsIgnoreCase("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Order> orders = orderRepository.findOrdersByUserId(userId, pageable);
 
         if (orders.isEmpty()) {
             throw new GlobalException(ErrorCode.USER_ORDER_NOT_FOUND);
         }
-        // 주문 목록 -> OrderResponseDto로 변환
-        return orders.stream()
-                .map(OrderMapper::toOrderResponseDto)
-                .toList();
+        return orders.map(OrderMapper::toOrderResponseDto);
     }
 
     // 주문 취소

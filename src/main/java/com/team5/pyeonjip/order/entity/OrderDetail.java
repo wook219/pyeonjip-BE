@@ -50,4 +50,8 @@ public class OrderDetail extends BaseTimeEntity {
     public Long getSubTotalPrice(){
         return getProductPrice() * getQuantity();
     }
+
+    public String getProductDetailName() {
+        return product != null ? product.getName() : null; // ProductDetail 엔티티에서 가져오기
+    }
 }
