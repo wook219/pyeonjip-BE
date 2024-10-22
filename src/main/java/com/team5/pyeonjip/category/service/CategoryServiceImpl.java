@@ -59,6 +59,15 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findLeafCategories(parentId);
     }
 
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getChildrenCategories() {
+
+        List<Category> children = categoryRepository.findByChildrenIsEmpty();
+        return children.stream()
+                .map(categoryMapper::toResponse)
+                .toList();
+    }
+
     @Transactional
     public CategoryResponse updateCategory(Long id, CategoryRequest request) {
 
