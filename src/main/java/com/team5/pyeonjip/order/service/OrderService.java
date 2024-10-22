@@ -12,7 +12,7 @@ public interface OrderService {
     void createOrder(CombinedOrderDto combinedOrderDto, String userEmail);
 
     // 주문 전체 조회
-    Page<OrderResponseDto> findOrdersByUserId(Long userId, int page, int size, String sortField, String sortDir);
+    List<OrderResponseDto> findOrdersByUserId(Long userId);
 
     // 주문 취소
     void cancelOrder(Long orderId);
