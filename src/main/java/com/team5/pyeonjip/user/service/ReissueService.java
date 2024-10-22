@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class ReissueService {
         // Refresh 토큰을 가져온다.
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
+        System.out.println(Arrays.toString(cookies));
         for (Cookie cookie : cookies) {
 
             if (cookie.getName().equals("refresh")) {
@@ -100,10 +102,9 @@ public class ReissueService {
         // cookie.setSecure(true);
 
         // 쿠키가 적용될 범위
-        // cookie.setPath("/");
-
-        // js 등에서 쿠키에 접근하지 못하도록.
-        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setDomain("localhost"); // 8080, 3000 도메인 공통 설정
+        cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
 
         return cookie;
     }
