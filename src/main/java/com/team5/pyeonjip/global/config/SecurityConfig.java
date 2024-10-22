@@ -117,20 +117,20 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart/sync").authenticated()                 // 2
                         //.requestMatchers("/api/cart/**").hasAnyRole("ADMIN", "USER")     // 3
 
-                        /*쿠폰*/
+                        /* 쿠폰 */
                         .requestMatchers("/api/coupon/**").permitAll()
                         .requestMatchers("/api/coupon/custom/**").hasRole("ADMIN")
 
-                        /*댓글*/
+                        /* 댓글 */
                         .requestMatchers("/api/comments/product/**").permitAll()
                         .requestMatchers("/api/comments/product-rating/**").permitAll()
                         //.requestMatchers("/api/comments/**").authenticated()
 
-                        /* 채팅 - 미정으로 permitAll() */
-                        .requestMatchers("/api/chat/**").permitAll()                      // 1
+                        /* 채팅 */
+                        .requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/chat/waiting-room").hasRole("USER")
                         .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
-                        //.requestMatchers("/api/chat/**").hasRole("USER")                  // 2
-                        //.requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "USER")      // 3
+                        .requestMatchers("/api/chat/activate-room").hasRole("ADMIN")
 
                         /* 카테고리 */
                         .requestMatchers("/api/category/**").permitAll()
@@ -142,7 +142,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/user/**").permitAll()                      // 1
                         //.requestMatchers("/api/user/**").hasRole("USER")                  // 2
                         //.requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")      // 3
-                        .requestMatchers("/api/user/**").authenticated()                      // 1
+                        .requestMatchers("/api/user/**").permitAll()                      // 1
 
                         /* 상품 */
                         .requestMatchers("/api/product/**").permitAll()
