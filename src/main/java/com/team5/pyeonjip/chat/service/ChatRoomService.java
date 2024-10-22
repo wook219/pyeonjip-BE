@@ -128,7 +128,7 @@ public class ChatRoomService {
     }
 
     public List<ChatRoomDto> getChatRoomsByUserEmail(String email){
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmail(email);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmailOrderByClosedAtDesc(email);
 
         List<ChatRoomDto> chatRoomDtos = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {
