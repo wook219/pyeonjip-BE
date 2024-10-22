@@ -92,6 +92,15 @@ public class ChatRoomService {
         return updatedRoomDto;
     }
 
+    public ChatRoomDto closeChatRoom(Long chatRoomId){
+        ChatRoom room = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        room.setStatus(ChatRoomStatus.CLOSED);
+
+        ChatRoom closedChatRoom = chatRoomRepository.save(room);
+        return chatRoomMapper.toDTO(closedChatRoom);
+    }
+
 
     private void notifyAdminsNewWaitingRoom(ChatRoom chatRoom) {
         messagingTemplate.convertAndSend("/topic/admin/waiting-rooms", chatRoom);
