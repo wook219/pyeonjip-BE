@@ -30,12 +30,6 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(name = "closed_at")
     private Timestamp closedAt;
 
-//    @Column(name = "user_id", nullable = false)
-//    private Long userId;
-//
-//    @Column(name = "admin_id", nullable = false)
-//    private Long adminId;
-
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id", nullable = false)
     private User user;
@@ -50,16 +44,6 @@ public class ChatRoom extends BaseTimeEntity {
 
     public void updateStatus(ChatRoomStatus status){
         this.status = status;
-    }
-
-    public void activateRoom(User admin) {
-        this.admin = admin;
-        this.status = ChatRoomStatus.ACTIVE;
-    }
-
-    // 채팅방 종료 상태 업데이트
-    public void closeRoom() {
-        this.status = ChatRoomStatus.CLOSED;
     }
 
 }
