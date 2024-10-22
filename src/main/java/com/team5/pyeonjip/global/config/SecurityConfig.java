@@ -111,7 +111,7 @@ public class SecurityConfig {
 
                         /*쿠폰*/
                         .requestMatchers("/api/coupon/**").permitAll()
-                        .requestMatchers("api/coupon/custom/**").hasRole("ADMIN")
+                        .requestMatchers("/api/coupon/custom/**").hasRole("ADMIN")
 
                         /*댓글*/
                         .requestMatchers("/api/comments/product/**").permitAll()
