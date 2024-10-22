@@ -116,7 +116,7 @@ public class SecurityConfig {
                         /*댓글*/
                         .requestMatchers("/api/comments/product/**").permitAll()
                         .requestMatchers("/api/comments/product-rating/**").permitAll()
-                        .requestMatchers("/api/comments/**").authenticated()
+                        //.requestMatchers("/api/comments/**").authenticated()
 
                         /* 채팅 - 미정으로 permitAll() */
                         .requestMatchers("/api/chat/**").permitAll()                      // 1

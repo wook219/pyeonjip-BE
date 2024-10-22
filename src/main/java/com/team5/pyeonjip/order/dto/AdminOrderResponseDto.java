@@ -18,7 +18,7 @@ public class AdminOrderResponseDto {
     private String userName; // 주문자 명
     private String phoneNumber; // 연락처
     private OrderStatus orderStatus; // 기본 ORDER
-    private Long totalPrice; // 결제 금액 = 상품 가격 * 상품 수량
+    private Long totalPrice; // 결제 금액
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt; // 생성 일
