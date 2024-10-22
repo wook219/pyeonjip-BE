@@ -1,9 +1,6 @@
 package com.team5.pyeonjip.user.controller;
 
-import com.team5.pyeonjip.user.dto.ApiResponse;
-import com.team5.pyeonjip.user.dto.MailDto;
-import com.team5.pyeonjip.user.dto.ResetPasswordRequest;
-import com.team5.pyeonjip.user.dto.UserFindAccountDto;
+import com.team5.pyeonjip.user.dto.*;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.SendEmailService;
 import com.team5.pyeonjip.user.service.UserService;
@@ -24,12 +21,11 @@ public class UserAuthController {
 
     // 계정 찾기
     @GetMapping("/find")
-    public ResponseEntity<String> findAccount(@RequestParam String name, @RequestParam String phoneNumber) {
+    public ResponseEntity<UserFoundAccountDto> findAccount(@RequestParam String name, @RequestParam String phoneNumber) {
 
-        UserFindAccountDto dto = new UserFindAccountDto(name, phoneNumber);
-        User user = userService.findAccount(dto);
-
-        return ResponseEntity.ok(user.getEmail());
+        UserFindAccountDto findDto = new UserFindAccountDto(name, phoneNumber);
+        UserFoundAccountDto foundDto = userService.findAccount(findDto);
+        return ResponseEntity.ok(foundDto);
     }
 
 
