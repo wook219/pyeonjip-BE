@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserFoundAccountDto {
 
+    private String name;
+
     private String email;
 }

@@ -140,17 +140,17 @@ public class OrderServiceImpl implements OrderService {
     // 주문 조회
     @Transactional(readOnly = true)
     @Override
-    public Page<OrderResponseDto> findOrdersByUserId(Long userId, int page, int size, String sortField, String sortDir) {
-        Sort sort = Sort.by(sortField);
-        sort = sortDir.equalsIgnoreCase("asc") ? sort.ascending() : sort.descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public List<OrderResponseDto> findOrdersByUserId(Long userId) {
 
-        Page<Order> orders = orderRepository.findOrdersByUserId(userId, pageable);
+        List<Order> orders = orderRepository.findOrdersByUserId(userId);
 
         if (orders.isEmpty()) {
             throw new GlobalException(ErrorCode.USER_ORDER_NOT_FOUND);
         }
-        return orders.map(OrderMapper::toOrderResponseDto);
+
+        return orders.stream()
+                .map(OrderMapper::toOrderResponseDto)
+                .toList();
     }
 
     // 주문 취소

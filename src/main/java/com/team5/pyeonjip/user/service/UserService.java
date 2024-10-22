@@ -28,6 +28,10 @@ public class UserService {
             throw new GlobalException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
+        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
+            throw new GlobalException(ErrorCode.PHONENUMBER_ALREADY_EXISTS);
+        }
+
 //      2. 중복 이메일이 없으면 회원가입 절차 실행
         try {
 //          2 - 1. 비밀번호 인코딩
@@ -128,7 +132,7 @@ public class UserService {
         User foundUser = userRepository.findByNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
                 .orElseThrow(() -> new GlobalException(ErrorCode.ACCOUNT_NOT_FOUND));;
 
-        return new UserFoundAccountDto(foundUser.getEmail());
+        return new UserFoundAccountDto(foundUser.getName(), foundUser.getEmail());
     }
 
 
