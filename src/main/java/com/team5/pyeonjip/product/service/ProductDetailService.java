@@ -104,7 +104,7 @@ public class ProductDetailService {
 
     // 단일 ProductDetail 삭제
     @Transactional
-    public void deleteProductDetail(Long productId, Long detailId) {
+    public void deleteProductDetail(Long detailId) {
         ProductDetail productDetail = productDetailRepository.findById(detailId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
 
