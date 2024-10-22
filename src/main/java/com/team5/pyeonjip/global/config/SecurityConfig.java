@@ -95,21 +95,14 @@ public class SecurityConfig {
         // 경로별 인가
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/signup").permitAll()
+                        .requestMatchers("/api/auth/**",
+                                         "/api/user/signup",
+                                         "/not-found",
+                                         "/").permitAll()
                         // 관리자만 접근 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 토큰 리이슈
                         .requestMatchers("/api/user/reissue").permitAll()
-
-                        /* 권한 처리하기 */
-                        /*
-                        * 1번의 permitAll()은 모든 사용자가 사용 가능합니다.
-                        * 2번의 authenticated()는 로그인한 사용자만 사용 가능합니다.
-                        * 3번은 2번이 잘 되지 않을 경우 사용하시면 되겠습니다.
-                        * 관리자만 접근 가능한 api는 위에 정의해뒀습니다!
-                        *
-                        * 고맙습니다 ,,,
-                        */
 
                         /* 장바구니 */
                         .requestMatchers("/api/cart/**").permitAll()                     // 1
@@ -125,39 +118,30 @@ public class SecurityConfig {
                         .requestMatchers("/api/comments/product-rating/**").permitAll()
                         .requestMatchers("/api/comments/**").authenticated()
 
-
-
-                        /* 채팅 */
-                        //.requestMatchers("/api/chat/**").permitAll()                      // 1
+                        /* 채팅 - 미정으로 permitAll() */
+                        .requestMatchers("/api/chat/**").permitAll()                      // 1
+                        .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
                         //.requestMatchers("/api/chat/**").hasRole("USER")                  // 2
                         //.requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "USER")      // 3
 
                         /* 카테고리 */
-                        //.requestMatchers("/api/category/**").permitAll()                  // 1
-                        //.requestMatchers("/api/category/**").hasRole("USER")              // 2
-                        //.requestMatchers("/api/category/**").hasAnyRole("ADMIN", "USER")  // 3
+                        .requestMatchers("/api/category/**").permitAll()
 
                         /* 주문 */
-                        //.requestMatchers("/api/order/**").permitAll()                     // 1
-                        //.requestMatchers("/api/order/**").hasRole("USER")                 // 2
-                        //.requestMatchers("/api/order/**").hasAnyRole("ADMIN", "USER")     // 3
+                        .requestMatchers("/api/orders/**").permitAll()
 
-                        /* 유저 */
-                        //.requestMatchers("/api/user/**").permitAll()                      // 1
+                        /* 유저 - 임시 전체 허용 */
+                        .requestMatchers("/api/user/**").permitAll()                      // 1
                         //.requestMatchers("/api/user/**").hasRole("USER")                  // 2
                         //.requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")      // 3
 
                         /* 상품 */
-                        //.requestMatchers("/api/product/**").permitAll()                    // 1
-                        //.requestMatchers("/api/product/**").hasRole("USER")                // 2
-                        //.requestMatchers("/api/product/**").hasAnyRole("ADMIN", "USER")    // 3
+                        .requestMatchers("/api/product/**").permitAll()
 
+                        /* Swagger */
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/chat/waiting-rooms").hasRole("ADMIN")
 
-                        // 위에서 처리되지 않은 api 요청은 어떻게 처리할 것인지.
-                        // 우선 1번으로 해두시는 게 테스트에 편하실 것 같습니다.
-                        // 1. 모두 허용, 2. 인증된 사용자만 사용 가능
+                        // 임시로 permitAll()
                         .anyRequest().permitAll());         // 1. 모두 허용
 //                        .anyRequest().authenticated());   // 2. 인증 필요
 
