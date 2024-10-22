@@ -132,7 +132,7 @@ public class UserService {
         User foundUser = userRepository.findByNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
                 .orElseThrow(() -> new GlobalException(ErrorCode.ACCOUNT_NOT_FOUND));;
 
-        return new UserFoundAccountDto(foundUser.getEmail());
+        return new UserFoundAccountDto(foundUser.getName(), foundUser.getEmail());
     }
 
 
