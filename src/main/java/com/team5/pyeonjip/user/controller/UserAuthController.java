@@ -2,8 +2,11 @@ package com.team5.pyeonjip.user.controller;
 
 import com.team5.pyeonjip.user.dto.*;
 import com.team5.pyeonjip.user.entity.User;
+import com.team5.pyeonjip.user.service.ReissueService;
 import com.team5.pyeonjip.user.service.SendEmailService;
 import com.team5.pyeonjip.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,7 @@ public class UserAuthController {
 
     private final SendEmailService sendEmailService;
     private final UserService userService;
+    private final ReissueService reissueService;
 
 
     /* 로그인, 로그아웃은 각 필터에서 경로 설정하였음.*/
@@ -46,6 +50,15 @@ public class UserAuthController {
         MailDto mailDto = sendEmailService.createMailAndChangePassword(dto.getEmail(), dto.getName());
         sendEmailService.mailSend(mailDto);
 
+        return ResponseEntity.ok().build();
+    }
+
+
+    // Access 토큰 재발급을 위한 컨트롤러
+    @PostMapping("/reissue")
+    public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
+
+        reissueService.reissueRefreshToken(request, response);
         return ResponseEntity.ok().build();
     }
 

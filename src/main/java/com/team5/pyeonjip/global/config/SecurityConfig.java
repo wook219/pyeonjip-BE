@@ -110,7 +110,7 @@ public class SecurityConfig {
                         // 관리자만 접근 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 토큰 리이슈
-                        .requestMatchers("/api/user/reissue").permitAll()
+                        .requestMatchers("/api/auth/reissue").permitAll()
 
                         /* 장바구니 */
                         .requestMatchers("/api/cart/**").permitAll()                     // 1
