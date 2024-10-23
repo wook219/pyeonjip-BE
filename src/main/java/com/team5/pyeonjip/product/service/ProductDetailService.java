@@ -3,12 +3,10 @@ package com.team5.pyeonjip.product.service;
 import com.team5.pyeonjip.cart.repository.CartRepository;
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
-import com.team5.pyeonjip.global.exception.ResourceNotFoundException;
 import com.team5.pyeonjip.product.dto.ProductRequest;
 import com.team5.pyeonjip.product.entity.Product;
 import com.team5.pyeonjip.product.entity.ProductDetail;
 import com.team5.pyeonjip.product.repository.ProductDetailRepository;
-import com.team5.pyeonjip.product.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +20,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductDetailService {
     private final ProductDetailRepository productDetailRepository;
-    private final S3BucketService s3BucketService;
     private final CartRepository cartRepository;
 
     // Create - 옵션 생성
@@ -79,20 +76,6 @@ public class ProductDetailService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
         productDetail.setQuantity(productDetail.getQuantity() + quantity); // 수량 변경
         productDetailRepository.save(productDetail);
-    }
-
-    // 대표 이미지 업로드 및 저장
-    @Transactional
-    public String uploadAndSaveMainImage(Long productDetailId, MultipartFile mainImage) throws IOException {
-        ProductDetail productDetail = productDetailRepository.findById(productDetailId)
-                .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
-
-        // S3에 업로드하고 대표 이미지 URL 설정
-        String mainImageUrl = s3BucketService.upload(mainImage, "main-images");
-        productDetail.setMainImage(mainImageUrl);
-        productDetailRepository.save(productDetail);
-
-        return mainImageUrl;
     }
 
     // 단일 ProductDetail 생성
