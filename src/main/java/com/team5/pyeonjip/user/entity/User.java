@@ -45,10 +45,6 @@ public class User {
     private String address;
 
     @NotNull
-    @Column(name = "password_hint", nullable = false)
-    private String passwordHint;
-
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
