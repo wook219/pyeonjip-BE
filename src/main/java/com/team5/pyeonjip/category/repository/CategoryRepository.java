@@ -29,6 +29,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @EntityGraph(attributePaths = {"children"})
     List<Category> findByParentId(Long parentId);
 
+    @EntityGraph(attributePaths = {"children"})
     List<Category> findByChildrenIsEmpty();
 
     Boolean existsByName(String name);
