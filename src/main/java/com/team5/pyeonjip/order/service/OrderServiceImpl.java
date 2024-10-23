@@ -19,10 +19,6 @@ import com.team5.pyeonjip.user.entity.Grade;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -156,10 +152,9 @@ public class OrderServiceImpl implements OrderService {
     // 주문 취소
     @Transactional
     @Override
-    public void cancelOrder(Long orderId) { // User authenticatedUser
+    public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.ORDER_NOT_FOUND));
-        // .filter(order -> order.getUser().getUserId().equals(authenticatedUser.getUserId())) // 주문자 확인
 
         // 배송 상태가 READY인 경우에만 취소 가능
         if (order.getDelivery().getStatus() != DeliveryStatus.READY) {
@@ -182,7 +177,7 @@ public class OrderServiceImpl implements OrderService {
         String userEmail = orderCartRequestDto.getEmail();
 
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
         Long cartTotalPrice = orderCartRequestDto
                 .getCartTotalPrice();

@@ -5,12 +5,10 @@ import com.team5.pyeonjip.order.service.OrderService;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -24,10 +22,10 @@ public class OrderApiController {
     @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(
             @RequestBody CombinedOrderDto combinedOrderDto,
-            @RequestParam("userEmail") String userEmail){
+            @RequestParam("email") String email){
 
         // 주문 생성 처리
-        orderService.createOrder(combinedOrderDto,userEmail);
+        orderService.createOrder(combinedOrderDto, email);
 
         return ResponseEntity.ok().build();
     }
