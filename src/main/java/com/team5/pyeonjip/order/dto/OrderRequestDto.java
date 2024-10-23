@@ -25,6 +25,4 @@ public class OrderRequestDto {
     private String requirement;
 
     private List<OrderDetailDto> orderDetails;
-
-//    private Long userId;
 }
