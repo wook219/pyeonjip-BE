@@ -25,6 +25,4 @@ public class SignUpDto {
     @NotNull
     private String address;
 
-    @NotNull
-    private String passwordHint;
 }
