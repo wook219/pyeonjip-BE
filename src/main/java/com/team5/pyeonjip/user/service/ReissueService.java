@@ -98,12 +98,12 @@ public class ReissueService {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
 
-        // https 통신 시
-        // cookie.setSecure(true);
+        // https 통신 시 (https여서 허용으로 수정)
+         cookie.setSecure(true);
 
         // 쿠키가 적용될 범위
         cookie.setPath("/");
-        cookie.setDomain("localhost"); // 8080, 3000 도메인 공통 설정
+        cookie.setDomain("https://ehedrefxzmygttpe.tunnel-pt.elice.io/:80"); // 80 도메인
         cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
 
         return cookie;
