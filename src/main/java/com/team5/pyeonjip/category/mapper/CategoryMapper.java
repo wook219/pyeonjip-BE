@@ -12,6 +12,7 @@ public interface CategoryMapper {
 
     Category toEntity(CategoryRequest request);
 
+    @Mapping(target = "sort", source = "sort")
     Category toEntity(CategoryCreateRequest request);
 
     CategoryResponse toResponse(Category category);

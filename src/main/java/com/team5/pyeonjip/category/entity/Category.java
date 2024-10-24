@@ -23,8 +23,8 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @ColumnDefault("999")
-    @Column(nullable = false)
+//    @ColumnDefault("999")
+//    @Column(nullable = false)
     private Integer sort; //낮을수록 먼저 반환
 
     @Column(name = "parent_id")
