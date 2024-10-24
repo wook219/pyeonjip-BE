@@ -102,6 +102,28 @@ public class CategoryUtils {
         }
     }
 
+    // FIXME: 현재 여러개 삭제는 불가하니 매개변수 타입을 바꿔줘야함
+    public void updateSiblingsSort(List<Category> categories) {
+
+        // 삭제할 카테고리의 첫 번째 카테고리 정보 가져오기
+        Category old = categories.getFirst();
+        Long parentId = old.getParentId();
+        Integer sortToDelete = old.getSort();
+
+        // 형제 카테고리 목록 가져오기
+        List<Category> oldSiblings = categoryRepository.findByParentId(parentId);
+
+        // 형제 카테고리의 sort 업데이트
+        for (Category sibling : oldSiblings) {
+            if (sibling.getSort() > sortToDelete) {
+                Category updatedSibling = sibling.toBuilder()
+                        .sort(sibling.getSort() - 1) // -1로 감소
+                        .build();
+                categoryRepository.save(updatedSibling);
+            }
+        }
+    }
+
     // 카테고리 삭제 후, 연관된 프로덕트에 null 적용
     public void deleteCategoriesAndUpdateProducts(List<Category> categories) {
 

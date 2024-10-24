@@ -95,8 +95,12 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse createCategory(CategoryCreateRequest request) {
 
         categoryValidate.validateName(request.getName());
+        Integer maxSort = categoryRepository.findMaxSortForRootCategories();
+        request.setSort(maxSort != null ? maxSort + 1 : 1);
 
         Category category = categoryMapper.toEntity(request);
+
+        System.out.println(category);
 
         return categoryMapper.toResponse(categoryRepository.save(category));
     }
@@ -114,6 +118,9 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
 
             List<Category> categories = categoryValidate.validateAndFindCategory(ids);
+
+            categoryUtils.updateSiblingsSort(categories);
+
             categoryUtils.deleteCategoriesAndUpdateProducts(categories);
 
             response.put("message", "카테고리가 삭제되었습니다.");
@@ -121,4 +128,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         return response;
     }
+
+
 }

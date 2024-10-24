@@ -63,8 +63,8 @@ public class SecurityConfig {
 
                                 CorsConfiguration configuration = new CorsConfiguration();
 
-                                // 데이터를 보내는 3000번 포트를 허용
-                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                // 데이터를 보내는 80번 포트를 허용
+                                configuration.setAllowedOrigins(Collections.singletonList("https://ehedrefxzmygttpe.tunnel-pt.elice.io"));
 
                                 // 모든 메서드 허용
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
@@ -75,7 +75,7 @@ public class SecurityConfig {
                                 configuration.setAllowedHeaders(Collections.singletonList("*"));
 
                                 // 허용 시간
-                                configuration.setMaxAge(3600L);
+//                                configuration.setMaxAge(3600L);
 
                                 // Authorization 헤더 노출
                                 configuration.setExposedHeaders(Collections.singletonList("Authorization"));

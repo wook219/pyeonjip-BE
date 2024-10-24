@@ -10,5 +10,7 @@ public class CategoryCreateRequest {
 
     private String name;
 
-    private Integer sort  = 999;
+    @Setter
+    private Integer sort;
+
 }
