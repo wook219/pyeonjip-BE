@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class ReissueService {
         // Refresh 토큰을 가져온다.
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
+        System.out.println(Arrays.toString(cookies));
         for (Cookie cookie : cookies) {
 
             if (cookie.getName().equals("refresh")) {
@@ -79,7 +81,14 @@ public class ReissueService {
         refreshRepository.deleteByRefresh(refreshToken);
         addRefresh(email, newRefreshToken, 86400000L);
 
-        response.setHeader("access", newAccessToken);
+        // 삭제 대상 토큰이 쿠키에 포함되는 문제가 있어, 명시적으로 삭제하는 코드를 추가
+        Cookie deleteOldRefreshToken = new Cookie("refresh", null);
+        deleteOldRefreshToken.setMaxAge(0);
+        deleteOldRefreshToken.setPath("/");
+        deleteOldRefreshToken.setHttpOnly(true);
+
+        response.setHeader("Authorization", "Bearer " + newAccessToken);
+        response.addCookie(deleteOldRefreshToken);
         response.addCookie(createCookie("refresh", newRefreshToken));
     }
 
@@ -89,14 +98,13 @@ public class ReissueService {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
 
-        // https 통신 시
-        // cookie.setSecure(true);
+        // https 통신 시 (https여서 허용으로 수정)
+         cookie.setSecure(true);
 
         // 쿠키가 적용될 범위
-        // cookie.setPath("/");
-
-        // js 등에서 쿠키에 접근하지 못하도록.
-        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setDomain("https://ehedrefxzmygttpe.tunnel-pt.elice.io"); // 80 도메인
+        cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
 
         return cookie;
     }

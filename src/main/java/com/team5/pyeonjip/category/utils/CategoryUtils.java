@@ -1,9 +1,7 @@
 package com.team5.pyeonjip.category.utils;
 
 import com.team5.pyeonjip.category.dto.CategoryRequest;
-import com.team5.pyeonjip.category.dto.CategoryResponse;
 import com.team5.pyeonjip.category.entity.Category;
-import com.team5.pyeonjip.category.mapper.CategoryMapper;
 import com.team5.pyeonjip.category.repository.CategoryRepository;
 import com.team5.pyeonjip.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +14,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CategoryUtils {
 
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
     private  final ProductRepository productRepository;
-    private final CategoryValidate categoryValidate;
 
     // 최상위 카테고리만 조회
     public List<Category> getParentCategories(List<Category> allCategories) {
@@ -30,18 +26,16 @@ public class CategoryUtils {
     }
 
     // 부모-자식 카테고리 연결
-    public List<CategoryResponse> createChildrenCategories(List<Category> parentCategories,
+    public List<Category> createChildrenCategories(List<Category> parentCategories,
                                                            List<Category> allCategories) {
 
         return parentCategories.stream()
                 .map(parent -> {
-                    List<CategoryResponse> children = allCategories.stream()
+                    List<Category> children = allCategories.stream()
                             .filter(child -> parent.getId().equals(child.getParentId()))
-                            .map(categoryMapper::toResponse)
                             .toList();
 
-                    // 부모 카테고리의 정보를 가진 CategoryResponse 객체를 생성
-                    return categoryMapper.toResponse(parent).toBuilder()
+                    return parent.toBuilder()
                             .children(children)
                             .build();
                 })
@@ -108,10 +102,30 @@ public class CategoryUtils {
         }
     }
 
-    // 카테고리 삭제 후, 연관된 프로덕트에 null 적용
-    public void deleteCategoriesAndUpdateProducts(List<Long> ids) {
+    // FIXME: 현재 여러개 삭제는 불가하니 매개변수 타입을 바꿔줘야함
+    public void updateSiblingsSort(List<Category> categories) {
 
-        List<Category> categories = categoryValidate.validateAndFindCategory(ids);
+        // 삭제할 카테고리의 첫 번째 카테고리 정보 가져오기
+        Category old = categories.getFirst();
+        Long parentId = old.getParentId();
+        Integer sortToDelete = old.getSort();
+
+        // 형제 카테고리 목록 가져오기
+        List<Category> oldSiblings = categoryRepository.findByParentId(parentId);
+
+        // 형제 카테고리의 sort 업데이트
+        for (Category sibling : oldSiblings) {
+            if (sibling.getSort() > sortToDelete) {
+                Category updatedSibling = sibling.toBuilder()
+                        .sort(sibling.getSort() - 1) // -1로 감소
+                        .build();
+                categoryRepository.save(updatedSibling);
+            }
+        }
+    }
+
+    // 카테고리 삭제 후, 연관된 프로덕트에 null 적용
+    public void deleteCategoriesAndUpdateProducts(List<Category> categories) {
 
         categories.forEach(category -> {
             productRepository.findByCategoryId(category.getId()).forEach(product -> {

@@ -15,18 +15,16 @@ spring:
       ddl-auto: update
     show-sql: 'true'
   jwt:
-    secret: dc5e9dd80f65e4ac4f67b718c01d50f02cf84b697d5ba6cfe2f4dddf2ecda8ff
+    secret: ${JWT_SECRET}
 
-  config:
-    import:
-      - s3bucket-sample.yml
   mail:
     host: smtp.gmail.com
     port: 587
-    username: your-email@gmail.com
-    password: your-email-password
-    protocol: smtp
-    smtp:
-      auth: true
-      starttls:
-        enable: true
+    username: ${SMTP_EMAIL}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+app:
+  api:
+    url: https://dsrkzpzrzxqkarjw.tunnel-pt.elice.io

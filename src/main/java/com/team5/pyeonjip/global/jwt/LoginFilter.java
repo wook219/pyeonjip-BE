@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -34,6 +33,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final RefreshRepository refreshRepository;
     private final ReissueService reissueService;
 
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository, ReissueService reissueService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
+        this.reissueService = reissueService;
+        setFilterProcessesUrl("/api/auth/login");
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -78,7 +84,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             String role = auth.getAuthority();
 
             // access & refresh 토큰 생성
-            String access = jwtUtil.createJwt("access", email, role, 600000L);
+            String access = jwtUtil.createJwt("access", email, role, 60000000L);
             String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
 
             // Repository에 refresh 토큰 저장

@@ -29,10 +29,6 @@ public class ChatMessage extends BaseTimeEntity {
     @Size(max = 200)
     private String message;
 
-//    @Column(name = "chat_room_id", nullable = false)
-//    private Long chatRoomId;
-
-//  mapping
     @ManyToOne
     @JoinColumn(name = "chat_room_id", referencedColumnName = "id", nullable = false)
     private ChatRoom chatRoom;

@@ -14,5 +14,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // 추가된 메서드
     List<ChatRoom> findByStatus(ChatRoomStatus status);
 
-    List<ChatRoom> findByUserEmail(String email);
+    List<ChatRoom> findByUserEmailOrderByClosedAtDesc(String email);
 }

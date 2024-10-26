@@ -20,5 +20,6 @@ public interface CategoryService {
 
     Map<String, String> deleteCategories(List<Long> ids);
 
-
+    // 상품 수정 시 카테고리 옵션에서 조회
+    List<CategoryResponse> getChildrenCategories();
 }

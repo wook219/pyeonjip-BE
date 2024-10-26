@@ -9,12 +9,13 @@ import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ public class ChatRoomService {
     private final UserRepository userRepository;
     private final ChatRoomMapper chatRoomMapper;
     private final SimpMessagingTemplate messagingTemplate;
-
 
     public List<ChatRoomDto> getChatRooms(){
         List<ChatRoom> chatRooms = chatRoomRepository.findAll();
@@ -92,24 +92,22 @@ public class ChatRoomService {
         return updatedRoomDto;
     }
 
+    public ChatRoomDto closeChatRoom(Long chatRoomId){
+        ChatRoom room = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
-    private void notifyAdminsNewWaitingRoom(ChatRoom chatRoom) {
-        messagingTemplate.convertAndSend("/topic/admin/waiting-rooms", chatRoom);
-    }
+        room.setStatus(ChatRoomStatus.CLOSED);
 
-    private void notifyUserRoomActivated(ChatRoomDto chatRoom) {
-        if (chatRoom.getUserEmail() == null) {
-            throw new GlobalException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
-        messagingTemplate.convertAndSendToUser(
-                chatRoom.getUserEmail(),
-                "/queue/chat-room-activated",
-                chatRoom
-        );
+        LocalDateTime now = LocalDateTime.now();
+        Timestamp currentTime = Timestamp.valueOf(now);
+        room.setClosedAt(currentTime);
+
+        ChatRoom closedChatRoom = chatRoomRepository.save(room);
+        return chatRoomMapper.toDTO(closedChatRoom);
     }
 
     public List<ChatRoomDto> getChatRoomsByUserEmail(String email){
-        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmail(email);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUserEmailOrderByClosedAtDesc(email);
 
         List<ChatRoomDto> chatRoomDtos = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {

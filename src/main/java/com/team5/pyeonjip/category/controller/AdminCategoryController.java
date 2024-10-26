@@ -19,6 +19,13 @@ public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> getChildrenCategories() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(categoryService.getChildrenCategories());
+    }
+
     @PatchMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable("categoryId") Long id,
                                                            @RequestBody CategoryRequest request) {
@@ -28,7 +35,7 @@ public class AdminCategoryController {
                 .body(categoryService.updateCategory(id, request));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryCreateRequest request) {
 
         return ResponseEntity

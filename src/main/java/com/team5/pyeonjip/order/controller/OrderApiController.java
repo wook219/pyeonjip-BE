@@ -6,7 +6,6 @@ import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,21 +22,20 @@ public class OrderApiController {
     @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(
             @RequestBody CombinedOrderDto combinedOrderDto,
-            @RequestParam("userEmail") String userEmail){
+            @RequestParam("email") String email){
 
         // 주문 생성 처리
-        orderService.createOrder(combinedOrderDto,userEmail);
+        orderService.createOrder(combinedOrderDto, email);
 
         return ResponseEntity.ok().build();
     }
 
     // 사용자 - 주문 목록 조회(마이페이지)
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponseDto>> getUserOrders(@RequestParam("userId") Long userId) { // @AuthenticationPrincipal User currentUser
+    public ResponseEntity<List<OrderResponseDto>> getUserOrders(@RequestParam("email") String email) {
 
-        User user = userService.findUser(userId);
+        User user = userService.findByEmail(email);
 
-        // 사용자별 주문 목록 조회
         List<OrderResponseDto> orderList = orderService.findOrdersByUserId(user.getId());
 
         return ResponseEntity.ok(orderList);
@@ -45,7 +43,7 @@ public class OrderApiController {
 
     // 사용자 - 주문 취소
     @PatchMapping("orders/{orderId}")
-    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId, @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId) {
         // 주문 취소 처리
         orderService.cancelOrder(orderId);
 
