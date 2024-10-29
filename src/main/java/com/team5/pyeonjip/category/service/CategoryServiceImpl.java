@@ -35,7 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
             List<Category> allCategories = categoryRepository.findAll();
             List<Category> parentCategories = categoryUtils.getParentCategories(allCategories);
 
-            return categoryUtils.createChildrenCategories(parentCategories, allCategories);
+            List<Category> resultCategories = categoryUtils.createChildrenCategories(parentCategories, allCategories);
+
+            return resultCategories.stream()
+                    .map(categoryMapper::toResponse)
+                    .toList();
 
         } else {
 
@@ -53,6 +57,15 @@ public class CategoryServiceImpl implements CategoryService {
         categoryValidate.validateAndFindCategory(parentId);
 
         return categoryRepository.findLeafCategories(parentId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getChildrenCategories() {
+
+        List<Category> children = categoryRepository.findByChildrenIsEmpty();
+        return children.stream()
+                .map(categoryMapper::toResponse)
+                .toList();
     }
 
     @Transactional
@@ -82,8 +95,12 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse createCategory(CategoryCreateRequest request) {
 
         categoryValidate.validateName(request.getName());
+        Integer maxSort = categoryRepository.findMaxSortForRootCategories();
+        request.setSort(maxSort != null ? maxSort + 1 : 1);
 
         Category category = categoryMapper.toEntity(request);
+
+        System.out.println(category);
 
         return categoryMapper.toResponse(categoryRepository.save(category));
     }
@@ -100,10 +117,17 @@ public class CategoryServiceImpl implements CategoryService {
 
         } else {
 
-            categoryUtils.deleteCategoriesAndUpdateProducts(ids);
+            List<Category> categories = categoryValidate.validateAndFindCategory(ids);
+
+            categoryUtils.updateSiblingsSort(categories);
+
+            categoryUtils.deleteCategoriesAndUpdateProducts(categories);
+
             response.put("message", "카테고리가 삭제되었습니다.");
         }
 
         return response;
     }
+
+
 }

@@ -51,7 +51,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-            throw new GlobalException(ErrorCode.MISSING_TOKEN);
+            return;
         }
 
         // 5. 토큰 만료 여부 확인. 만료시 오류를 출력하고 다음 필터로 넘기지 않는다.
@@ -59,7 +59,12 @@ public class JWTFilter extends OncePerRequestFilter {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
 
-            throw new GlobalException(ErrorCode.ACCESS_TOKEN_EXPIRED);
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            PrintWriter writer = response.getWriter();
+            writer.write("{\"error\": \"토큰이 만료되었습니다.\"}");
+            writer.flush();
+            return;
         }
 
         // 6. 토큰이 access인지 확인한다. (페이로드에 명시되어 있다.)

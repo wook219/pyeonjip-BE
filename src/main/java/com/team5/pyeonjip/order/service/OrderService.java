@@ -1,7 +1,6 @@
 package com.team5.pyeonjip.order.service;
 
 import com.team5.pyeonjip.order.dto.*;
-import com.team5.pyeonjip.user.entity.User;
 
 import java.util.List;
 

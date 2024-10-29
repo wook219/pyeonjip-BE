@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 회원 등급에 따른 배송비 계산
-    private Long calculateDeliveryPrice(User user) {
+    public Long calculateDeliveryPrice(User user) {
         // 기본 배송비 3000원
         long deliveryPrice = 3000L;
 
@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 회원 등급에 따른 할인율 계산
-    private double calculateDiscountRate(User user) {
+    public double calculateDiscountRate(User user) {
         return switch (user.getGrade()) {
             case GOLD -> 0.1; // 10% 할인
             case SILVER -> 0.05; // 5% 할인
@@ -122,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 총 금액 계산
-    private Long calculateTotalPrice(User user, Long cartTotalPrice) {
+    public Long calculateTotalPrice(User user, Long cartTotalPrice) {
         // 1. 회원 등급에 따른 할인율 계산
         double discountRate = calculateDiscountRate(user);
 
@@ -137,13 +137,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> findOrdersByUserId(Long userId) {
-        // 사용자 ID로 주문 목록 조회
+
         List<Order> orders = orderRepository.findOrdersByUserId(userId);
 
         if (orders.isEmpty()) {
             throw new GlobalException(ErrorCode.USER_ORDER_NOT_FOUND);
         }
-        // 주문 목록 -> OrderResponseDto로 변환
+
         return orders.stream()
                 .map(OrderMapper::toOrderResponseDto)
                 .toList();
@@ -152,10 +152,9 @@ public class OrderServiceImpl implements OrderService {
     // 주문 취소
     @Transactional
     @Override
-    public void cancelOrder(Long orderId) { // User authenticatedUser
+    public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.ORDER_NOT_FOUND));
-        // .filter(order -> order.getUser().getUserId().equals(authenticatedUser.getUserId())) // 주문자 확인
 
         // 배송 상태가 READY인 경우에만 취소 가능
         if (order.getDelivery().getStatus() != DeliveryStatus.READY) {
@@ -178,7 +177,7 @@ public class OrderServiceImpl implements OrderService {
         String userEmail = orderCartRequestDto.getEmail();
 
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
         Long cartTotalPrice = orderCartRequestDto
                 .getCartTotalPrice();

@@ -29,6 +29,13 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @EntityGraph(attributePaths = {"children"})
     List<Category> findByParentId(Long parentId);
 
+    @EntityGraph(attributePaths = {"children"})
+    List<Category> findByChildrenIsEmpty();
+
+    // parentId가 null인 데이터들 중 sort 번호가 가장 높은 카테고리 조회
+    @Query("SELECT MAX(c.sort) FROM Category c WHERE c.parentId IS NULL")
+    Integer findMaxSortForRootCategories();
+
     Boolean existsByName(String name);
 
     // 네이티브 쿼리 적용

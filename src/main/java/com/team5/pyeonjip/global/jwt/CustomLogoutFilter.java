@@ -21,6 +21,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final String LOGOUT_URL = "/api/auth/logout";
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -32,7 +33,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 로그아웃 경로로 요청이 왔는지 확인한다.
         String requestUri = request.getRequestURI();
-        if (!requestUri.matches("^\\/logout$")) {
+        if (!requestUri.equals(LOGOUT_URL)) {
 
             // 로그아웃 경로가 아니면 다음 필터로 넘어간다.
             filterChain.doFilter(request, response);

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,18 +20,42 @@ public class CouponController {
     @PostMapping
     public ResponseEntity<Coupon> createCoupon(@RequestParam Long discount) {
         Coupon coupon = couponService.createRandomCoupon(discount);
-        return ResponseEntity.status(HttpStatus.OK).body(coupon);
+        return ResponseEntity.status(HttpStatus.CREATED).body(coupon);
     }
 
+    // 커스텀 쿠폰 생성 API
+    @PostMapping("/custom")
+    public ResponseEntity<Coupon> createCouponCustom(
+            @RequestBody Coupon customCoupon) {
+        Coupon coupon = couponService.createCoupon(customCoupon);
+        return ResponseEntity.status(HttpStatus.CREATED).body(coupon);
+    }
+
+    // 쿠폰 수정
+    @PutMapping
+    public ResponseEntity<Coupon> updateCoupon(
+            @RequestBody Coupon coupon) {
+        return ResponseEntity.status(HttpStatus.OK).body(couponService.updateCoupon(coupon));
+    }
+
+    // 쿠폰 목록 조회
     @GetMapping
     public ResponseEntity<List<Coupon>> getCoupons() {
         List<Coupon> coupons = couponService.getAllCoupons();
         return ResponseEntity.status(HttpStatus.OK).body(coupons);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Coupon> deleteCoupon(@RequestParam Long id) {
+    // 쿠폰 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCoupon(@PathVariable Long id) {
         couponService.deleteCouponById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // 쿠폰 사용 (상태 관리)
+    @PostMapping("/use/{id}")
+    public ResponseEntity<Void> useCoupon(@PathVariable Long id){
+        couponService.useCoupon(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

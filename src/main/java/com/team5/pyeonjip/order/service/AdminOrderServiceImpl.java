@@ -7,6 +7,7 @@ import com.team5.pyeonjip.order.entity.Order;
 import com.team5.pyeonjip.order.enums.DeliveryStatus;
 import com.team5.pyeonjip.order.mapper.OrderMapper;
 import com.team5.pyeonjip.order.repository.OrderRepository;
+import com.team5.pyeonjip.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminOrderServiceImpl implements AdminOrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderServiceImpl orderService;
 
     private Order findOrderById(Long orderId) {
         return orderRepository.findById(orderId)
@@ -52,14 +54,21 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         sort = sortDir.equalsIgnoreCase("asc") ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // 검색어가 있을 경우 이메일로 조회
+        Page<Order> orders;
         if (keyword != null && !keyword.isEmpty()) {
-            return orderRepository.findOrdersByUserEmail(keyword, pageable)
-                    .map(OrderMapper::toAdminOrderResponseDto);
+            // 검색어가 있을 경우 이메일로 조회
+            orders = orderRepository.findOrdersByUserEmail(keyword, pageable);
         } else {
             // 검색어가 없으면 모든 주문 조회
-            return orderRepository.findAll(pageable)
-                    .map(OrderMapper::toAdminOrderResponseDto);
+            orders = orderRepository.findAll(pageable);
         }
+        return orders.map(order -> {
+            User user = order.getUser();
+
+            double discountRate = orderService.calculateDiscountRate(user);
+            Long deliveryPrice = orderService.calculateDeliveryPrice(user);
+
+            return OrderMapper.toAdminOrderResponseDto(order, deliveryPrice, discountRate);
+        });
     }
 }
