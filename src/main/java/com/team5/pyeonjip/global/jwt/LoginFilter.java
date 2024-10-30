@@ -3,16 +3,13 @@ package com.team5.pyeonjip.global.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
-import com.team5.pyeonjip.user.dto.CustomUserDetails;
 import com.team5.pyeonjip.user.entity.Refresh;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
 import com.team5.pyeonjip.user.service.ReissueService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,20 +23,23 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
+import static com.team5.pyeonjip.global.jwt.CookieUtil.createCookie;
+
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
-    private final ReissueService reissueService;
 
     public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository, ReissueService reissueService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
-        this.reissueService = reissueService;
+
+        // 로그인 엔드포인트 변경
         setFilterProcessesUrl("/api/auth/login");
     }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -59,7 +59,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             throw new GlobalException(ErrorCode.INVALID_LOGIN_REQUEST);
         }
 
-        // 세 번째 인자는 우선 null
+        // 세 번째 인자는 우선 null. 로그인 시 다른 인증 정보를 사용하지 않기 때문.
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
 
         try {
@@ -73,7 +73,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     // 로그인 시 access & refresh 토큰 발급
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authentication) throws IOException, ServletException {
         try {
             // 토큰에 유저 정보와 role을 stream으로 받아온다.
             String email = authentication.getName();
@@ -84,33 +87,37 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             String role = auth.getAuthority();
 
             // access & refresh 토큰 생성
-            String access = jwtUtil.createJwt("access", email, role, 60000000L);
-            String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
+            String access = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRED_MS);
+            String refresh = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRED_MS);
 
             // Repository에 refresh 토큰 저장
-            addRefresh(email, refresh, 86400000L);
+            addRefresh(email, refresh);
 
             // 응답 설정
-            response.setHeader("Authorization", "Bearer " + access);
-            response.addCookie(reissueService.createCookie("refresh", refresh));
+            response.setHeader(AuthConstants.AUTH_HEADER, AuthConstants.AUTH_TYPE + access);
+            response.addCookie(createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new GlobalException(ErrorCode.LOGIN_PROCESSING_ERROR);
         }
     }
 
+
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
         throw new GlobalException(ErrorCode.AUTHENTICATION_FAILED);
     }
 
 
     // Todo: Mapper 사용해보기
     // Repository에 Refresh 토큰을 저장
-    private void addRefresh(String email, String refresh, Long expiredMs) {
+    private void addRefresh(String email, String refresh) {
 
         // 만료일 설정
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
+        Date date = new Date(System.currentTimeMillis() + AuthConstants.REFRESH_TOKEN_EXPIRED_MS);
 
         Refresh newRefresh = new Refresh();
         newRefresh.setEmail(email);

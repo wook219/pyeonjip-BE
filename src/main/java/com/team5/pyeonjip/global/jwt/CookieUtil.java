@@ -4,11 +4,13 @@ import jakarta.servlet.http.Cookie;
 
 public class CookieUtil {
 
-    String COOKIE_DOMAIN = "localhost";
-    String COOKIE_PATH = "/";
-    int COOKIE_MAX_AGE = 24 * 60 * 60;
+    public final static String COOKIE_DOMAIN = "https://ehedrefxzmygttpe.tunnel-pt.elice.io";
+    public final static String COOKIE_PATH = "/";
+    public final static int COOKIE_MAX_AGE = 24 * 60 * 60;
 
-    public Cookie createCookie(String key, String value) {
+
+    // Todo: 정적 메서드로 관리해도 괜찮은가?
+    public static Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
 

@@ -6,7 +6,7 @@ public class AuthConstants {
     public static final String AUTH_HEADER = "Authorization";
 
     // Access Token의 타입
-    public static final String AUTH_TOKEN = "Bearer ";
+    public static final String AUTH_TYPE = "Bearer ";
 
     // 각 Token의 유효 시간
     public static final Long REFRESH_TOKEN_EXPIRED_MS = 600000L;

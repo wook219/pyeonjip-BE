@@ -2,6 +2,8 @@ package com.team5.pyeonjip.user.service;
 
 import com.team5.pyeonjip.global.exception.ErrorCode;
 import com.team5.pyeonjip.global.exception.GlobalException;
+import com.team5.pyeonjip.global.jwt.AuthConstants;
+import com.team5.pyeonjip.global.jwt.CookieUtil;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
 import com.team5.pyeonjip.user.entity.Refresh;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Date;
+
+import static com.team5.pyeonjip.global.jwt.CookieUtil.createCookie;
 
 @RequiredArgsConstructor
 @Service
@@ -74,40 +78,40 @@ public class ReissueService {
         String role = jwtUtil.getRole(refreshToken);
 
         // Access, Refresh JWT를 새로 생성.
-        String newAccessToken = jwtUtil.createJwt("access", email, role, 600000L);
-        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, 86400000L);
+        String newAccessToken = jwtUtil.createJwt("access", email, role, AuthConstants.ACCESS_TOKEN_EXPIRED_MS);
+        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, AuthConstants.REFRESH_TOKEN_EXPIRED_MS);
 
         // Refresh 토큰을 생성한 후, DB에 저장된 기존의 토큰은 삭제하고 새로운 토큰을 저장한다.
         refreshRepository.deleteByRefresh(refreshToken);
-        addRefresh(email, newRefreshToken, 86400000L);
+        addRefresh(email, newRefreshToken, AuthConstants.REFRESH_TOKEN_EXPIRED_MS);
 
         // 삭제 대상 토큰이 쿠키에 포함되는 문제가 있어, 명시적으로 삭제하는 코드를 추가
         Cookie deleteOldRefreshToken = new Cookie("refresh", null);
         deleteOldRefreshToken.setMaxAge(0);
-        deleteOldRefreshToken.setPath("/");
+        deleteOldRefreshToken.setPath(CookieUtil.COOKIE_PATH);
         deleteOldRefreshToken.setHttpOnly(true);
 
-        response.setHeader("Authorization", "Bearer " + newAccessToken);
+        response.setHeader(AuthConstants.AUTH_HEADER, AuthConstants.AUTH_TYPE + newAccessToken);
         response.addCookie(deleteOldRefreshToken);
         response.addCookie(createCookie("refresh", newRefreshToken));
     }
 
 
-    public Cookie createCookie(String key, String value) {
-
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
-
-        // https 통신 시 (https여서 허용으로 수정)
-         cookie.setSecure(true);
-
-        // 쿠키가 적용될 범위
-        cookie.setPath("/");
-        cookie.setDomain("https://ehedrefxzmygttpe.tunnel-pt.elice.io"); // 80 도메인
-        cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
-
-        return cookie;
-    }
+//    public Cookie createCookie(String key, String value) {
+//
+//        Cookie cookie = new Cookie(key, value);
+//        cookie.setMaxAge(24 * 60 * 60);
+//
+//        // https 통신 시 (https여서 허용으로 수정)
+//         cookie.setSecure(true);
+//
+//        // 쿠키가 적용될 범위
+//        cookie.setPath("/");
+//        cookie.setDomain("https://ehedrefxzmygttpe.tunnel-pt.elice.io"); // 80 도메인
+//        cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
+//
+//        return cookie;
+//    }
 
 
     private void addRefresh(String email, String refresh, Long expiredMs) {

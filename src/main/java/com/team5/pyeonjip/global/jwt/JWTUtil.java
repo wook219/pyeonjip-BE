@@ -48,7 +48,7 @@ public class JWTUtil {
     }
 
 
-    // access / refresh 토큰 구별을 위한 카테고리 getter
+    // Access / Refresh 토큰 구별을 위한 카테고리 getter
     public String getCategory(String token) {
 
         return Jwts.parser()
