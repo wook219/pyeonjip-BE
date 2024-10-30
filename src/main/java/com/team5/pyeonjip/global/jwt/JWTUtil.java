@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -15,14 +14,10 @@ import java.util.Date;
 public class JWTUtil {
 
     // secret key를 저장할 객체
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
-//    오류 발생.
-//    public JWTUtil(@Value("{spring.jwt.secret") String secret) {
-//
-//        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
-//    }
 
+    // SecretKey 객체 생성자 주입
     public JWTUtil(@Value("${spring.jwt.secret}") String secret) {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
 
@@ -91,12 +86,14 @@ public class JWTUtil {
     }
 
 
-    // category는 access / refresh 토큰을 구별하기 위해 사용한다.
-    // 참고: 기존에는 email이 username이었음.
+    // Todo: setHeaderParam이 꼭 필요한지 확인해보기.
+    // Access / Refresh 토큰을 구별하기 위해 category를 Payload에 담는다.
     public String createJwt(String category, String email, String role, Long expiredMs) {
 
         return Jwts.builder()
+                // Todo: 타입을 명시해줬다. 필요성은 확인이 필요하다.
                 .setHeaderParam("typ", "JWT")
+
                 // 키에 대한 특정 데이터를 담는다.
                 .claim("category", category)
                 .claim("email", email)
