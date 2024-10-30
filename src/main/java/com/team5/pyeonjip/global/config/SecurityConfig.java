@@ -2,10 +2,7 @@ package com.team5.pyeonjip.global.config;
 
 import com.team5.pyeonjip.global.exception.JWTAccessDeniedHandler;
 import com.team5.pyeonjip.global.exception.JWTAuthenticationEntryPoint;
-import com.team5.pyeonjip.global.jwt.CustomLogoutFilter;
-import com.team5.pyeonjip.global.jwt.JWTFilter;
-import com.team5.pyeonjip.global.jwt.JWTUtil;
-import com.team5.pyeonjip.global.jwt.LoginFilter;
+import com.team5.pyeonjip.global.jwt.*;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
 import com.team5.pyeonjip.user.service.ReissueService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +61,7 @@ public class SecurityConfig {
                                 CorsConfiguration configuration = new CorsConfiguration();
 
                                 // 데이터를 보내는 80번 포트를 허용
-                                configuration.setAllowedOrigins(Collections.singletonList("https://ehedrefxzmygttpe.tunnel-pt.elice.io"));
+                                configuration.setAllowedOrigins(Collections.singletonList(AuthConstants.DOMAIN));
 
                                 // 모든 메서드 허용
                                 configuration.setAllowedMethods(Collections.singletonList("*"));

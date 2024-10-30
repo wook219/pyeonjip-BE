@@ -2,6 +2,8 @@ package com.team5.pyeonjip.global.jwt;
 
 public class AuthConstants {
 
+    public static final String DOMAIN = "https://ehedrefxzmygttpe.tunnel-pt.elice.io";
+
     // Access Token을 전달할 헤더
     public static final String AUTH_HEADER = "Authorization";
 

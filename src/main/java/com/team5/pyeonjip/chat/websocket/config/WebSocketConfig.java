@@ -1,5 +1,6 @@
 package com.team5.pyeonjip.chat.websocket.config;
 
+import com.team5.pyeonjip.global.jwt.AuthConstants;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("https://ehedrefxzmygttpe.tunnel-pt.elice.io")
+                .setAllowedOrigins(AuthConstants.DOMAIN)
                 .withSockJS();
     }
 }

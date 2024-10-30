@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie;
 
 public class CookieUtil {
 
-    public final static String COOKIE_DOMAIN = "https://ehedrefxzmygttpe.tunnel-pt.elice.io";
+    public final static String COOKIE_DOMAIN = AuthConstants.DOMAIN;
     public final static String COOKIE_PATH = "/";
     public final static int COOKIE_MAX_AGE = 24 * 60 * 60;
 
