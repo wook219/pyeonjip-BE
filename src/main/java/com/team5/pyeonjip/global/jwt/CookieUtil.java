@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie;
 
 public class CookieUtil {
 
-    public final static String COOKIE_DOMAIN = AuthConstants.DOMAIN;
+    public final static String COOKIE_DOMAIN = "localhost";
     public final static String COOKIE_PATH = "/";
     public final static int COOKIE_MAX_AGE = 24 * 60 * 60;
 
@@ -17,7 +17,7 @@ public class CookieUtil {
         cookie.setMaxAge(COOKIE_MAX_AGE);
         cookie.setPath(COOKIE_PATH);
         cookie.setDomain(COOKIE_DOMAIN);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setHttpOnly(true);
 
         return cookie;
