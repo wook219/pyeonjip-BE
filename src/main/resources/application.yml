@@ -27,4 +27,4 @@ spring:
       mail.smtp.starttls.enable: true
 app:
   api:
-    url: http://43.202.4.58:3000
+    url: http://13.124.177.96:8080
