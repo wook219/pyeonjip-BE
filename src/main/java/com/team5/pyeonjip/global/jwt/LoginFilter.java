@@ -95,6 +95,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             response.addCookie(reissueService.createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
+            System.out.println("error : " + e.getMessage());
+            e.printStackTrace();
             throw new GlobalException(ErrorCode.LOGIN_PROCESSING_ERROR);
         }
     }
