@@ -66,8 +66,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             // AuthenticationManager에 Token을 넘겨서 검증을 진행한다.
             return authenticationManager.authenticate(authToken);
         } catch (AuthenticationException e) {
-            System.out.println("error : " + e.getMessage());
-            e.printStackTrace();
             throw new GlobalException(ErrorCode.AUTHENTICATION_FAILED);
         }
     }
@@ -97,6 +95,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             response.addCookie(reissueService.createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
+            System.out.println("error : " + e.getMessage());
+            e.printStackTrace();
             throw new GlobalException(ErrorCode.LOGIN_PROCESSING_ERROR);
         }
     }
