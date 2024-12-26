@@ -99,11 +99,11 @@ public class ReissueService {
         cookie.setMaxAge(24 * 60 * 60);
 
         // https 통신 시 (https여서 허용으로 수정)
-         cookie.setSecure(true);
+        cookie.setSecure(false);
 
         // 쿠키가 적용될 범위
         cookie.setPath("/");
-        cookie.setDomain("http://43.202.4.58:3000"); // 80 도메인
+        cookie.setDomain("43.202.4.58"); // 80 도메인
         cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
 
         return cookie;
