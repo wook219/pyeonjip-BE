@@ -103,7 +103,7 @@ public class ReissueService {
 
         // 쿠키가 적용될 범위
         cookie.setPath("/");
-        cookie.setDomain("43.202.4.58"); // 80 도메인
+//        cookie.setDomain("43.202.4.58"); // 80 도메인
         cookie.setHttpOnly(true); // js 등에서 쿠키에 접근하지 못하도록.
 
         return cookie;
