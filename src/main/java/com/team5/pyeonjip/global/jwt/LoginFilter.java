@@ -83,9 +83,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             GrantedAuthority auth = iter.next();
             String role = auth.getAuthority();
 
+            System.out.println("email = " + email);
+            System.out.println("role = " + role);
+
             // access & refresh 토큰 생성
             String access = jwtUtil.createJwt("access", email, role, 60000000L);
             String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
+
+            System.out.println("access = " + access);
+            System.out.println("refresh = " + refresh);
 
             // Repository에 refresh 토큰 저장
             addRefresh(email, refresh, 86400000L);
@@ -94,10 +100,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             response.setHeader("Authorization", "Bearer " + access);
             response.addCookie(reissueService.createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
+
+            System.out.println("response.getHeader() = " + response.getHeader("Authorization"));
+            System.out.println("response.getStatus() = " + response.getStatus());
         } catch (Exception e) {
             System.out.println("error : " + e.getMessage());
             e.printStackTrace();
-            throw new GlobalException(ErrorCode.LOGIN_PROCESSING_ERROR);
         }
     }
 
